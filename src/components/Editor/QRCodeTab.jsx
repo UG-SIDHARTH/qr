@@ -179,20 +179,28 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
             </div>
           </div>
 
-          {/* Color Customizer */}
+          {/* Color Wheel Customizer */}
           <div className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-3">
-            <label className="block text-xs font-semibold text-slate-200">Color Palette</label>
+            <label className="block text-xs font-semibold text-slate-200">QR Color Wheel Palette</label>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="block text-xs text-slate-400 mb-1">Foreground Color</span>
+                <span className="block text-xs text-slate-400 mb-1.5">Foreground Color</span>
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={qrConfig.fgColor || '#a855f7'}
-                    onChange={(e) => handleUpdate('fgColor', e.target.value)}
-                    className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
-                  />
+                  <div className="relative flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full p-0.5 bg-[conic-gradient(at_center,_red,_yellow,_lime,_cyan,_blue,_magenta,_red)] cursor-pointer shadow-md hover:scale-105 transition-transform flex items-center justify-center">
+                      <input
+                        type="color"
+                        value={qrConfig.fgColor || '#a855f7'}
+                        onChange={(e) => handleUpdate('fgColor', e.target.value)}
+                        className="w-full h-full opacity-0 cursor-pointer absolute inset-0 z-10"
+                      />
+                      <div 
+                        className="w-5 h-5 rounded-full border border-white shadow-sm"
+                        style={{ backgroundColor: qrConfig.fgColor || '#a855f7' }}
+                      />
+                    </div>
+                  </div>
                   <input
                     type="text"
                     value={qrConfig.fgColor || '#a855f7'}
@@ -203,14 +211,22 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
               </div>
 
               <div>
-                <span className="block text-xs text-slate-400 mb-1">Background Color</span>
+                <span className="block text-xs text-slate-400 mb-1.5">Background Color</span>
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="color"
-                    value={qrConfig.bgColor || '#090d16'}
-                    onChange={(e) => handleUpdate('bgColor', e.target.value)}
-                    className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
-                  />
+                  <div className="relative flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full p-0.5 bg-[conic-gradient(at_center,_red,_yellow,_lime,_cyan,_blue,_magenta,_red)] cursor-pointer shadow-md hover:scale-105 transition-transform flex items-center justify-center">
+                      <input
+                        type="color"
+                        value={qrConfig.bgColor || '#090d16'}
+                        onChange={(e) => handleUpdate('bgColor', e.target.value)}
+                        className="w-full h-full opacity-0 cursor-pointer absolute inset-0 z-10"
+                      />
+                      <div 
+                        className="w-5 h-5 rounded-full border border-white shadow-sm"
+                        style={{ backgroundColor: qrConfig.bgColor || '#090d16' }}
+                      />
+                    </div>
+                  </div>
                   <input
                     type="text"
                     value={qrConfig.bgColor || '#090d16'}

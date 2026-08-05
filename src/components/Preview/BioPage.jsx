@@ -51,7 +51,13 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
     downloadVCard(profile, socials);
   };
 
-  const activeSocials = socials.filter(s => s.enabled);
+  const isEmptyProfile = !profile.name && !profile.username && activeSocials.length === 0 && (!portfolio || portfolio.length === 0);
+
+  const displayAvatar = profile.avatar || null;
+  const displayName = profile.name || (isEmptyProfile ? "Your Name" : "");
+  const displayUsername = profile.username || (isEmptyProfile ? "your_username" : "");
+  const displayTitle = profile.title || (isEmptyProfile ? "Digital Creator & Developer" : "");
+  const displayBio = profile.bio || (isEmptyProfile ? "Customize your name, headshot, bio and links in the editor tabs to build your digital bio card." : "");
 
   return (
     <div className={`w-full min-h-full flex flex-col items-center justify-center ${theme.bgStyle || 'bg-[#090d16]'} p-4 sm:p-8 transition-all`}>
@@ -63,54 +69,64 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
         <div className="flex flex-col items-center text-center space-y-3">
           
           {/* Avatar / Logo */}
-          {profile.avatar && (
+          {displayAvatar ? (
             <div className="relative group mb-1">
               <div 
                 className="absolute -inset-1 rounded-full blur-md opacity-60 group-hover:opacity-100 transition duration-300 animate-pulse-glow"
                 style={{ backgroundColor: accentColor }}
               />
               <img
-                src={profile.avatar}
-                alt={profile.name || "Profile"}
+                src={displayAvatar}
+                alt={displayName || "Profile"}
                 className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-[#0f1422] shadow-2xl"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
               />
             </div>
+          ) : (
+            <div className="relative mb-1">
+              <div 
+                className="absolute -inset-1 rounded-full blur-md opacity-40 animate-pulse"
+                style={{ backgroundColor: accentColor }}
+              />
+              <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-900 border-2 border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-xl">
+                <User className="w-9 h-9 opacity-80" />
+              </div>
+            </div>
           )}
 
           {/* Title / Name */}
           <div className="space-y-1">
             <div className="flex items-center justify-center space-x-1.5">
-              {profile.name && (
-                <h1 className="text-2xl sm:text-3xl font-extrabold font-outfit text-white tracking-tight">
-                  {profile.name}
+              {displayName && (
+                <h1 className={`text-2xl sm:text-3xl font-extrabold font-outfit tracking-tight ${isEmptyProfile ? 'text-slate-300' : 'text-white'}`}>
+                  {displayName}
                 </h1>
               )}
-              {profile.verified && (
+              {(profile.verified || isEmptyProfile) && (
                 <BadgeCheck className="w-5 h-5 text-indigo-400 fill-indigo-400/20" />
               )}
             </div>
             
-            {profile.username && (
-              <p className="text-xs font-mono text-indigo-300">
-                @{profile.username}
+            {displayUsername && (
+              <p className="text-xs font-mono text-indigo-300/90">
+                @{displayUsername}
               </p>
             )}
           </div>
 
           {/* Headline Title */}
-          {profile.title && (
+          {displayTitle && (
             <p className="text-xs font-semibold text-slate-300 tracking-wide uppercase px-3 py-1 bg-slate-800/60 rounded-full border border-slate-700/60">
-              {profile.title}
+              {displayTitle}
             </p>
           )}
 
           {/* Bio / Description */}
-          {profile.bio && (
+          {displayBio && (
             <p className="text-xs text-slate-300 leading-relaxed max-w-sm">
-              {profile.bio}
+              {displayBio}
             </p>
           )}
 
@@ -128,6 +144,17 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
               <span>{profile.location}</span>
             </div>
           )}
+
+          {/* vCard Save Contact Button */}
+          <div className="pt-2 w-full">
+            <button
+              onClick={handleSaveContact}
+              className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/20 border border-emerald-400/30 flex items-center justify-center space-x-2 transition-all transform active:scale-95 group"
+            >
+              <UserPlus className="w-4 h-4 text-emerald-300 group-hover:scale-110 transition-transform" />
+              <span>📇 Save to Phone Contacts (vCard)</span>
+            </button>
+          </div>
 
         </div>
 

@@ -104,22 +104,54 @@ export default function ThemeTab({ theme = {}, onChange }) {
           ))}
         </div>
 
-        {/* Custom Accent Color */}
-        <div className="pt-2 border-t border-slate-800">
-          <label className="block text-xs font-medium text-slate-300 mb-2">Custom Accent Color</label>
+        {/* Custom Accent Color Wheel */}
+        <div className="pt-2 border-t border-slate-800 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-semibold text-slate-200">Custom Accent Color Wheel</label>
+            <span className="text-[10px] font-mono text-slate-400">{currentTheme.accentColor || '#6366f1'}</span>
+          </div>
+
           <div className="flex items-center space-x-3">
-            <input
-              type="color"
-              value={currentTheme.accentColor || '#6366f1'}
-              onChange={(e) => handleUpdate('accentColor', e.target.value)}
-              className="w-10 h-10 rounded-xl cursor-pointer bg-transparent border-0"
-            />
+            {/* Color Wheel Icon Input */}
+            <div className="relative group flex-shrink-0">
+              <div 
+                className="w-10 h-10 rounded-full p-0.5 bg-[conic-gradient(at_center,_red,_yellow,_lime,_cyan,_blue,_magenta,_red)] cursor-pointer shadow-lg hover:scale-105 transition-transform flex items-center justify-center"
+              >
+                <input
+                  type="color"
+                  value={currentTheme.accentColor || '#6366f1'}
+                  onChange={(e) => handleUpdate('accentColor', e.target.value)}
+                  className="w-full h-full opacity-0 cursor-pointer absolute inset-0 z-10"
+                />
+                <div 
+                  className="w-7 h-7 rounded-full border-2 border-white shadow-md"
+                  style={{ backgroundColor: currentTheme.accentColor || '#6366f1' }}
+                />
+              </div>
+            </div>
+
             <input
               type="text"
               value={currentTheme.accentColor || '#6366f1'}
               onChange={(e) => handleUpdate('accentColor', e.target.value)}
+              placeholder="#6366f1"
               className="flex-1 px-3 py-2 glass-input rounded-xl text-xs font-mono"
             />
+          </div>
+
+          {/* Quick Color Wheel Swatches */}
+          <div className="flex items-center space-x-2 pt-1 overflow-x-auto no-scrollbar">
+            {['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#10b981', '#f59e0b', '#06b6d4', '#3b82f6'].map((hex) => (
+              <button
+                key={hex}
+                type="button"
+                onClick={() => handleUpdate('accentColor', hex)}
+                className={`w-6 h-6 rounded-full border transition-all flex-shrink-0 ${
+                  currentTheme.accentColor === hex ? 'scale-110 border-white ring-2 ring-indigo-500/50' : 'border-white/20 hover:scale-105'
+                }`}
+                style={{ backgroundColor: hex }}
+              />
+            ))}
           </div>
         </div>
 

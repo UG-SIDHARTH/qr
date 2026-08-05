@@ -9,7 +9,7 @@ export default function PhoneMockup({ profileData, onOpenQR }) {
     <div className="flex items-center justify-center p-2 sm:p-6 w-full h-full">
       
       {/* Phone Shell */}
-      <div className="relative w-full max-w-[380px] h-[720px] bg-slate-900 rounded-[48px] phone-frame border-4 border-slate-700 overflow-hidden flex flex-col shadow-2xl">
+      <div className="relative w-full max-w-[350px] xl:max-w-[370px] h-[580px] xl:h-[630px] max-h-[calc(100vh-9rem)] bg-slate-900 rounded-[44px] phone-frame border-4 border-slate-700 overflow-hidden flex flex-col shadow-2xl">
         
         {/* Phone Notch & Status Bar */}
         <div className="w-full bg-slate-950 px-7 pt-3 pb-2 flex items-center justify-between z-30 select-none border-b border-white/5">

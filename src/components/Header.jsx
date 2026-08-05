@@ -101,16 +101,7 @@ export default function Header({
             className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all hidden sm:flex"
             title="Export / Import Profile JSON"
           >
-            <Download className="w-4 h-4" />
-          </button>
-
-          {/* Reset Button */}
-          <button
-            onClick={onReset}
-            className="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-slate-400 hover:text-rose-400 rounded-xl transition-all hidden sm:flex"
-            title="Reset Studio Data"
-          >
-            <RotateCcw className="w-4 h-4" />
+            <Download className="w-4 h-4 text-indigo-400" />
           </button>
         </div>
 

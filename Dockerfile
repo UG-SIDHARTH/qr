@@ -28,6 +28,24 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy built dist files from build stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Add custom Nginx SPA routing & Gzip compression configuration
+RUN echo 'server { \
+    listen 80; \
+    server_name localhost; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    gzip on; \
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript; \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+    location ~* \.(?:css|js|jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ { \
+        expires 1M; \
+        access_log off; \
+        add_header Cache-Control "public"; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
+
 # Expose port 80
 EXPOSE 80
 

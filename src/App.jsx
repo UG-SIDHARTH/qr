@@ -275,14 +275,6 @@ export default function App() {
     window.history.replaceState(null, '', '#bulk');
   };
 
-  const handleClearAllData = () => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.clear();
-    }
-    setProfileData(EMPTY_PROFILE);
-    setMembersList([]);
-  };
-
   const handleSelectMemberToEdit = (member) => {
     setProfileData(member);
     setViewMode('editor');
@@ -366,7 +358,6 @@ export default function App() {
         viewMode={viewMode}
         setViewMode={handleSetViewMode}
         onOpenExport={() => setIsExportModalOpen(true)}
-        onReset={handleClearAllData}
         onQuickQR={() => setIsQRModalOpen(true)}
         onPublish={handlePublishProfile}
         profile={profileData.profile}
@@ -490,9 +481,9 @@ export default function App() {
           </div>
 
           {/* Right Live Phone Simulator */}
-          <div className="hidden lg:flex flex-col items-center">
-            <div className="sticky top-24">
-              <div className="text-center mb-3 flex items-center justify-between px-2">
+          <div className="hidden lg:flex flex-col items-center lg:col-span-5 w-full">
+            <div className="sticky top-20 w-full flex flex-col items-center">
+              <div className="w-full max-w-[370px] mb-2 flex items-center justify-between px-2">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
                   Live Mobile Simulator
