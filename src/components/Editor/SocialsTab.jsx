@@ -16,19 +16,18 @@ import {
   MessageSquare, 
   Music,
   Share2,
-  Sparkles
+  Sparkles,
+  ArrowUpRight
 } from 'lucide-react';
 
 const PRESET_PLATFORMS = [
-  { name: 'GitHub', platform: 'github', icon: 'Github', color: '#333333', defaultUrl: 'https://github.com/' },
-  { name: 'LinkedIn', platform: 'linkedin', icon: 'Linkedin', color: '#0a66c2', defaultUrl: 'https://linkedin.com/in/' },
-  { name: 'X / Twitter', platform: 'twitter', icon: 'Twitter', color: '#1da1f2', defaultUrl: 'https://x.com/' },
-  { name: 'Portfolio Website', platform: 'portfolio', icon: 'Globe', color: '#6366f1', defaultUrl: 'https://' },
-  { name: 'YouTube', platform: 'youtube', icon: 'Youtube', color: '#ff0000', defaultUrl: 'https://youtube.com/@' },
-  { name: 'Instagram', platform: 'instagram', icon: 'Instagram', color: '#e1306c', defaultUrl: 'https://instagram.com/' },
-  { name: 'Discord', platform: 'discord', icon: 'MessageSquare', color: '#5865f2', defaultUrl: 'https://discord.gg/' },
-  { name: 'Spotify / Music', platform: 'spotify', icon: 'Music', color: '#1db954', defaultUrl: 'https://open.spotify.com/' },
-  { name: 'Email Contact', platform: 'email', icon: 'Mail', color: '#ea4335', defaultUrl: 'mailto:' },
+  { name: 'FOSS Cell', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Free & Open Source Software' },
+  { name: 'IEEE Student Branch', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Advancing Technology for Humanity' },
+  { name: 'Alchemy IEDC', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Innovation & Entrepreneurship' },
+  { name: 'ISTE', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Technical Education Excellence' },
+  { name: 'TinkerHub CEAL', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Tinkering, Innovation & Community' },
+  { name: 'GitHub', platform: 'github', icon: 'Github', color: '#333333', defaultUrl: 'https://github.com/', subtitle: 'Open Source Repositories' },
+  { name: 'LinkedIn', platform: 'linkedin', icon: 'Linkedin', color: '#0a66c2', defaultUrl: 'https://linkedin.com/in/', subtitle: 'Professional Network' },
 ];
 
 export default function SocialsTab({ socials, onChange }) {
@@ -38,10 +37,11 @@ export default function SocialsTab({ socials, onChange }) {
     const newSocial = {
       id: Date.now().toString(),
       platform: preset ? preset.platform : 'custom',
-      title: preset ? preset.name : 'Custom Link',
+      title: preset ? preset.name : 'New Club / Link',
+      subtitle: preset ? preset.subtitle : 'Subtitle description...',
       url: preset ? preset.defaultUrl : 'https://',
       icon: preset ? preset.icon : 'Globe',
-      color: preset ? preset.color : '#6366f1',
+      color: preset ? preset.color : '#1e293b',
       enabled: true,
       badge: '',
     };
@@ -73,20 +73,20 @@ export default function SocialsTab({ socials, onChange }) {
       <div>
         <h3 className="text-base font-semibold text-white flex items-center gap-2">
           <Share2 className="w-4 h-4 text-purple-400" />
-          Social Media & Custom Links
+          Clubs, Social Media & Custom Link Cards
         </h3>
         <p className="text-xs text-slate-400 mt-1">
-          Add, reorder, or toggle your social channels and custom destination URLs.
+          Add link cards with titles, subtitles, and destination URLs (matching CEAL Clubs model).
         </p>
       </div>
 
       {/* Preset Quick Add Buttons */}
       <div className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-2">
-        <label className="block text-xs font-medium text-slate-300">Quick Add Platform Presets</label>
+        <label className="block text-xs font-medium text-slate-300">Quick Add CEAL Club Presets</label>
         <div className="flex flex-wrap gap-2">
           {PRESET_PLATFORMS.map((preset) => (
             <button
-              key={preset.platform}
+              key={preset.name}
               onClick={() => handleAddSocial(preset)}
               className="px-2.5 py-1.5 bg-slate-800 hover:bg-indigo-950/60 border border-slate-700 hover:border-indigo-500/40 text-slate-200 text-xs font-medium rounded-xl flex items-center space-x-1.5 transition-all"
             >
@@ -99,7 +99,7 @@ export default function SocialsTab({ socials, onChange }) {
             className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl flex items-center space-x-1.5 transition-all shadow-md shadow-indigo-600/20"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Add Custom Link</span>
+            <span>Add Custom Card</span>
           </button>
         </div>
       </div>
@@ -145,22 +145,16 @@ export default function SocialsTab({ socials, onChange }) {
 
                 <div className="flex-1 min-w-0">
                   <h4 className="text-xs font-semibold text-slate-200 truncate">
-                    {social.title || 'Untitled Link'}
+                    {social.title || 'Untitled Card'}
                   </h4>
                   <p className="text-[11px] text-slate-400 truncate">
-                    {social.url}
+                    {social.subtitle || social.url}
                   </p>
                 </div>
               </div>
 
               {/* Badges & Actions */}
               <div className="flex items-center space-x-2">
-                {social.badge && (
-                  <span className="px-2 py-0.5 text-[10px] font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded-full hidden sm:inline">
-                    {social.badge}
-                  </span>
-                )}
-
                 {/* Enable/Disable Toggle */}
                 <button
                   onClick={() => handleUpdate(social.id, 'enabled', !social.enabled)}
@@ -197,17 +191,28 @@ export default function SocialsTab({ socials, onChange }) {
             {editingId === social.id && (
               <div className="mt-4 pt-3 border-t border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label className="block text-slate-400 mb-1">Button Title</label>
+                  <label className="block text-slate-400 mb-1">Card Title</label>
                   <input
                     type="text"
                     value={social.title}
                     onChange={(e) => handleUpdate(social.id, 'title', e.target.value)}
                     className="w-full px-3 py-1.5 glass-input rounded-xl text-xs"
-                    placeholder="e.g. Follow on Twitter"
+                    placeholder="e.g. FOSS Cell"
                   />
                 </div>
 
                 <div>
+                  <label className="block text-slate-400 mb-1">Subtitle / Description</label>
+                  <input
+                    type="text"
+                    value={social.subtitle || ''}
+                    onChange={(e) => handleUpdate(social.id, 'subtitle', e.target.value)}
+                    className="w-full px-3 py-1.5 glass-input rounded-xl text-xs"
+                    placeholder="e.g. Free & Open Source Software"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
                   <label className="block text-slate-400 mb-1">Destination URL</label>
                   <input
                     type="text"
@@ -225,22 +230,22 @@ export default function SocialsTab({ socials, onChange }) {
                     value={social.badge || ''}
                     onChange={(e) => handleUpdate(social.id, 'badge', e.target.value)}
                     className="w-full px-3 py-1.5 glass-input rounded-xl text-xs"
-                    placeholder="e.g. 5k+ Followers, New Video"
+                    placeholder="e.g. Active, Official"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 mb-1">Brand Accent Color</label>
+                  <label className="block text-slate-400 mb-1">Card Accent Color</label>
                   <div className="flex items-center space-x-2">
                     <input
                       type="color"
-                      value={social.color || '#6366f1'}
+                      value={social.color || '#1e293b'}
                       onChange={(e) => handleUpdate(social.id, 'color', e.target.value)}
                       className="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0"
                     />
                     <input
                       type="text"
-                      value={social.color || '#6366f1'}
+                      value={social.color || '#1e293b'}
                       onChange={(e) => handleUpdate(social.id, 'color', e.target.value)}
                       className="flex-1 px-3 py-1.5 glass-input rounded-xl text-xs font-mono"
                     />
@@ -253,7 +258,7 @@ export default function SocialsTab({ socials, onChange }) {
 
         {socials.length === 0 && (
           <div className="text-center py-8 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-500 text-xs">
-            No social links added yet. Click one of the quick add presets above!
+            No link cards added yet. Click one of the CEAL Club presets above!
           </div>
         )}
       </div>
