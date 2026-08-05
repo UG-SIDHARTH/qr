@@ -40,24 +40,25 @@ const ICON_MAP = {
   Cpu
 };
 
-export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
-  const { profile = {}, socials = [], portfolio = [], theme = {} } = profileData;
+export default function BioPage({ profileData = {}, onOpenQR, isFullView = false }) {
+  const { profile = {}, socials = [], portfolio = [], theme = {} } = profileData || {};
 
-  const buttonRadius = theme.buttonRadius || 'rounded-2xl';
-  const accentColor = theme.accentColor || '#6366f1';
-  const buttonGlow = theme.buttonGlow !== false;
+  const buttonRadius = theme?.buttonRadius || 'rounded-2xl';
+  const accentColor = theme?.accentColor || '#6366f1';
+  const buttonGlow = theme?.buttonGlow !== false;
 
   const handleSaveContact = () => {
     downloadVCard(profile, socials);
   };
 
-  const isEmptyProfile = !profile.name && !profile.username && activeSocials.length === 0 && (!portfolio || portfolio.length === 0);
+  const activeSocials = (socials || []).filter(s => s && s.enabled);
+  const isEmptyProfile = !profile?.name && !profile?.username && activeSocials.length === 0 && (!portfolio || portfolio.length === 0);
 
-  const displayAvatar = profile.avatar || null;
-  const displayName = profile.name || (isEmptyProfile ? "Your Name" : "");
-  const displayUsername = profile.username || (isEmptyProfile ? "your_username" : "");
-  const displayTitle = profile.title || (isEmptyProfile ? "Digital Creator & Developer" : "");
-  const displayBio = profile.bio || (isEmptyProfile ? "Customize your name, headshot, bio and links in the editor tabs to build your digital bio card." : "");
+  const displayAvatar = profile?.avatar || null;
+  const displayName = profile?.name || (isEmptyProfile ? "Your Name" : "");
+  const displayUsername = profile?.username || (isEmptyProfile ? "your_username" : "");
+  const displayTitle = profile?.title || (isEmptyProfile ? "Digital Creator & Developer" : "");
+  const displayBio = profile?.bio || (isEmptyProfile ? "Customize your name, headshot, bio and links in the editor tabs to build your digital bio card." : "");
 
   return (
     <div className={`w-full min-h-full flex flex-col items-center justify-center ${theme.bgStyle || 'bg-[#090d16]'} p-4 sm:p-8 transition-all`}>
