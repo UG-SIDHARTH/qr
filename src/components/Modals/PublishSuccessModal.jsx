@@ -8,7 +8,7 @@ export default function PublishSuccessModal({ isOpen, onClose, profileData, onVi
   const [copied, setCopied] = useState(false);
   const { profile, qrConfig = {} } = profileData || {};
 
-  const profileUrl = getProfileUrl(profile);
+  const profileUrl = getProfileUrl(profileData);
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;

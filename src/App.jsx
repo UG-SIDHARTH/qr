@@ -268,10 +268,53 @@ export default function App() {
       alert("Please enter at least your Name or Username in your profile before publishing!");
       return;
     }
-    const hash = getProfileHash(profileData.profile);
-    if (hash) {
-      window.history.replaceState(null, '', hash);
-    }
+
+    const cleanName = profileData.profile?.name?.trim() || 'User';
+    const cleanUser = (profileData.profile?.username || cleanName)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_')
+      .replace(/^#/, '');
+
+    const publishedRecord = {
+      ...profileData,
+      id: profileData.id || cleanUser,
+      employeeId: profileData.employeeId || 'USER-CUSTOM',
+      department: profileData.department || 'User Created',
+      profile: {
+        ...profileData.profile,
+        name: cleanName,
+        username: cleanUser,
+      }
+    };
+
+    // Update active profile state
+    setProfileData(publishedRecord);
+
+    // Sync directly to Super Admin directory roster & localStorage
+    setMembersList(prev => {
+      const existingIdx = prev.findIndex(m => 
+        String(m.id) === String(publishedRecord.id) ||
+        (m.profile?.username?.toLowerCase() === cleanUser)
+      );
+
+      let newMembers;
+      if (existingIdx >= 0) {
+        newMembers = [...prev];
+        newMembers[existingIdx] = publishedRecord;
+      } else {
+        newMembers = [publishedRecord, ...prev];
+      }
+
+      try {
+        localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
+      } catch (e) {}
+
+      return newMembers;
+    });
+
+    // Set URL hash to #<username>
+    window.history.replaceState(null, '', `#${cleanUser}`);
     setIsPublishModalOpen(true);
   };
 
