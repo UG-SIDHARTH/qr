@@ -5,7 +5,7 @@ import {
   Share2, 
   QrCode, 
   UserPlus, 
-  ExternalLink, 
+  ArrowUpRight, 
   FolderGit2,
   Sparkles,
   Github,
@@ -18,7 +18,10 @@ import {
   MessageSquare,
   Music,
   Star,
-  User
+  User,
+  Zap,
+  Code2,
+  Cpu
 } from 'lucide-react';
 import { downloadVCard } from '../../utils/vcard';
 
@@ -32,10 +35,13 @@ const ICON_MAP = {
   Mail,
   MessageSquare,
   Music,
+  Zap,
+  Code2,
+  Cpu
 };
 
 export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
-  const { profile, socials = [], portfolio = [], theme = {} } = profileData;
+  const { profile = {}, socials = [], portfolio = [], theme = {} } = profileData;
 
   const handleSaveContact = () => {
     downloadVCard(profile, socials);
@@ -44,42 +50,37 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
   const activeSocials = socials.filter(s => s.enabled);
 
   return (
-    <div className={`w-full min-h-full flex flex-col items-center ${theme.bgStyle || 'bg-preset-midnight'} p-4 sm:p-6 transition-all`}>
-      <div className={`w-full ${isFullView ? 'max-w-xl py-8' : 'max-w-md py-4'} space-y-6`}>
+    <div className={`w-full min-h-full flex flex-col items-center justify-center ${theme.bgStyle || 'bg-[#090d16]'} p-4 sm:p-8 transition-all`}>
+      
+      {/* Outer Card Container (Matches CEAL / Modern Linktree Card aesthetic) */}
+      <div className={`w-full ${isFullView ? 'max-w-md my-6 p-6 sm:p-8' : 'max-w-md p-4'} bg-[#0f1422]/90 border border-slate-800/90 rounded-[32px] shadow-2xl backdrop-blur-2xl space-y-6 text-center`}>
         
-        {/* Header / Profile Card */}
+        {/* Header / Profile Info */}
         <div className="flex flex-col items-center text-center space-y-3">
           
-          {/* Avatar with Glow */}
-          <div className="relative group">
-            <div 
-              className="absolute -inset-1 rounded-full blur-md opacity-70 group-hover:opacity-100 transition duration-300 animate-pulse-glow"
-              style={{ backgroundColor: theme.accentColor || '#6366f1' }}
-            />
-            {profile.avatar ? (
+          {/* Avatar / Logo */}
+          {profile.avatar && (
+            <div className="relative group mb-1">
+              <div 
+                className="absolute -inset-1 rounded-full blur-md opacity-60 group-hover:opacity-100 transition duration-300 animate-pulse-glow"
+                style={{ backgroundColor: theme.accentColor || '#6366f1' }}
+              />
               <img
                 src={profile.avatar}
                 alt={profile.name || "Profile"}
-                className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-slate-900 shadow-2xl"
+                className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-[#0f1422] shadow-2xl"
                 onError={(e) => {
                   e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
                 }}
               />
-            ) : null}
-            <div 
-              className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-900 border-4 border-slate-800 flex items-center justify-center text-slate-500 shadow-2xl"
-              style={{ display: profile.avatar ? 'none' : 'flex' }}
-            >
-              <User className="w-12 h-12 text-slate-600" />
             </div>
-          </div>
+          )}
 
-          {/* Name & Handle */}
+          {/* Title / Name */}
           <div className="space-y-1">
             <div className="flex items-center justify-center space-x-1.5">
-              <h1 className="text-xl sm:text-2xl font-bold font-outfit text-white tracking-tight">
-                {profile.name || "Your Name Here"}
+              <h1 className="text-2xl sm:text-3xl font-extrabold font-outfit text-white tracking-tight">
+                {profile.name || "CEAL Clubs"}
               </h1>
               {profile.verified && (
                 <BadgeCheck className="w-5 h-5 text-indigo-400 fill-indigo-400/20" />
@@ -93,37 +94,37 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
             )}
           </div>
 
-          {/* Title / Profession */}
+          {/* Headline Title */}
           {profile.title && (
-            <p className="text-xs font-medium text-slate-300 max-w-xs">
+            <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
               {profile.title}
+            </p>
+          )}
+
+          {/* Bio / Description */}
+          {profile.bio && (
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm px-2">
+              {profile.bio}
             </p>
           )}
 
           {/* Status Banner */}
           {profile.statusText && (
-            <div className="px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-[11px] font-medium flex items-center space-x-1.5 shadow-sm">
+            <div className="px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-[11px] font-medium inline-flex items-center space-x-1.5 shadow-sm">
               <span>{profile.statusText}</span>
             </div>
           )}
 
-          {/* Bio paragraph */}
-          {profile.bio && (
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              {profile.bio}
-            </p>
-          )}
-
           {/* Location Tag */}
           {profile.location && (
-            <div className="flex items-center space-x-1 text-[11px] text-slate-400">
+            <div className="flex items-center justify-center space-x-1 text-[11px] text-slate-400">
               <MapPin className="w-3.5 h-3.5 text-rose-400" />
               <span>{profile.location}</span>
             </div>
           )}
 
-          {/* Quick Action Buttons: Save Contact vCard & QR Code Modal */}
-          <div className="flex items-center space-x-2 pt-2">
+          {/* Action Buttons */}
+          <div className="flex items-center justify-center space-x-2 pt-1">
             <button
               onClick={handleSaveContact}
               className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-1.5 transition-all transform active:scale-95"
@@ -134,7 +135,7 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
 
             <button
               onClick={onOpenQR}
-              className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-xl backdrop-blur-md border border-white/10 flex items-center space-x-1.5 transition-all active:scale-95"
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium rounded-xl border border-slate-700 flex items-center space-x-1.5 transition-all active:scale-95"
             >
               <QrCode className="w-3.5 h-3.5" />
               <span>Show QR</span>
@@ -143,8 +144,8 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
 
         </div>
 
-        {/* Social Links List */}
-        <div className="space-y-3 w-full">
+        {/* Links Cards List (CEAL / Linktree Card Style) */}
+        <div className="space-y-3 w-full pt-1">
           {activeSocials.map((social) => {
             const IconComponent = ICON_MAP[social.icon] || Globe;
             return (
@@ -153,33 +154,40 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`group relative w-full p-3.5 ${theme.cardStyle || 'glass-card'} ${theme.buttonRadius || 'rounded-2xl'} flex items-center justify-between transition-all duration-300 transform hover:-translate-y-0.5`}
-                style={{
-                  boxShadow: theme.buttonGlow ? `0 0 15px ${social.color}25` : 'none'
-                }}
+                className="group relative w-full p-4 bg-[#141a29] hover:bg-[#1a2235] border border-slate-800/80 hover:border-slate-600 rounded-2xl flex items-center justify-between transition-all duration-300 shadow-md transform hover:-translate-y-0.5"
               >
-                <div className="flex items-center space-x-3 min-w-0">
-                  <div 
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform group-hover:scale-110"
-                    style={{ backgroundColor: social.color || theme.accentColor || '#6366f1' }}
-                  >
-                    <IconComponent className="w-4 h-4" />
-                  </div>
+                <div className="flex items-center space-x-3.5 min-w-0">
+                  {/* Optional Icon */}
+                  {social.icon && (
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform group-hover:scale-105"
+                      style={{ backgroundColor: social.color || theme.accentColor || '#6366f1' }}
+                    >
+                      <IconComponent className="w-5 h-5" />
+                    </div>
+                  )}
 
+                  {/* Title & Subtitle */}
                   <div className="flex-1 min-w-0 text-left">
-                    <span className="block text-xs font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
+                    <span className="block text-sm font-bold text-white group-hover:text-indigo-300 transition-colors truncate">
                       {social.title}
                     </span>
+                    {social.subtitle && (
+                      <span className="block text-xs text-slate-400 font-normal truncate mt-0.5">
+                        {social.subtitle}
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                {/* Right Side Arrow Icon */}
+                <div className="flex items-center space-x-2 pl-2">
                   {social.badge && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold bg-white/10 text-white/90 rounded-full border border-white/10">
+                    <span className="px-2 py-0.5 text-[10px] font-bold bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30">
                       {social.badge}
                     </span>
                   )}
-                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                  <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </div>
               </a>
             );
@@ -187,9 +195,9 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
 
           {activeSocials.length === 0 && (
             <div className="text-center py-8 px-4 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-400 text-xs space-y-1">
-              <p className="font-semibold text-slate-300">No social links added yet</p>
+              <p className="font-semibold text-slate-300">No links added yet</p>
               <p className="text-[11px] text-slate-500">
-                Use the Studio Editor to add your GitHub, LinkedIn, X/Twitter, or custom links.
+                Use the Studio Editor to add custom link cards like FOSS Cell, IEEE, IEDC, and ISTE.
               </p>
             </div>
           )}
@@ -197,11 +205,11 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
 
         {/* Portfolio Showcase Grid */}
         {portfolio && portfolio.length > 0 && (
-          <div className="space-y-3 pt-4 w-full">
+          <div className="space-y-3 pt-2 w-full text-left">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-xs font-bold text-slate-300 tracking-wider uppercase flex items-center gap-1.5">
                 <FolderGit2 className="w-3.5 h-3.5 text-emerald-400" />
-                Portfolio Showcase
+                Featured Portfolio
               </h3>
               <span className="text-[10px] text-slate-500">{portfolio.length} Projects</span>
             </div>
@@ -213,13 +221,13 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`group ${theme.cardStyle || 'glass-card'} rounded-2xl p-3 flex gap-3 transition-all duration-300 hover:border-emerald-500/40`}
+                  className="group bg-[#141a29] hover:bg-[#1a2235] border border-slate-800 rounded-2xl p-3.5 flex gap-3 transition-all duration-300"
                 >
                   {project.image && (
                     <img
                       src={project.image}
                       alt={project.title}
-                      className="w-20 h-20 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform"
+                      className="w-16 h-16 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform"
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
@@ -259,16 +267,12 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
         )}
 
         {/* Footer */}
-        <div className="pt-6 text-center space-y-2">
-          <button
-            onClick={onOpenQR}
-            className="inline-flex items-center space-x-1 text-[11px] text-slate-500 hover:text-indigo-400 transition-colors"
-          >
-            <QrCode className="w-3.5 h-3.5" />
-            <span>Scan QR Code to Share Profile</span>
-          </button>
-          <p className="text-[10px] text-slate-600 font-outfit">
-            Powered by LinkTree & QR Studio
+        <div className="pt-4 border-t border-slate-800/80 text-center space-y-1">
+          <p className="text-[11px] text-slate-400 font-medium">
+            powered by <span className="font-bold text-slate-200">train303</span> and <span className="font-bold text-slate-200">deploy505</span>
+          </p>
+          <p className="text-[10px] text-slate-500">
+            {profile.footerText || "College of Engineering Attingal, IHRD, Kerala"}
           </p>
         </div>
 
