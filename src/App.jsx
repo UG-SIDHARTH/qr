@@ -14,7 +14,7 @@ import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { EMPTY_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl, decodeHashToProfile } from './utils/url';
+import { getProfileHash, getProfileUrl } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -39,16 +39,10 @@ const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   if (!hash) return { view: 'preview' };
 
-  // 1. Try decoding compressed payload from URL hash (Works cross-device with 0 server)
-  const decodedPayload = decodeHashToProfile(hash);
-  if (decodedPayload && (decodedPayload.profile?.name || decodedPayload.profile?.username)) {
-    return { view: 'preview', member: decodedPayload };
-  }
-
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
   if (!cleanHash) return { view: 'preview' };
 
-  // 2. Check system routes
+  // 1. Check system routes
   if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
     return { view: 'bulk' };
   }
@@ -56,7 +50,7 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     return { view: 'editor' };
   }
 
-  // 3. Check active single profile match
+  // 2. Check active single profile match
   if (activeProfile?.profile) {
     const p = activeProfile.profile;
     if (
@@ -67,14 +61,14 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     }
   }
 
-  // 4. Check user= ID lookup
+  // 3. Check user= ID lookup
   if (cleanHash.startsWith('user=')) {
     const userId = cleanHash.replace('user=', '').trim();
     const found = members.find(m => String(m.id) === userId || String(m.id) === `user_${userId}`);
     if (found) return { view: 'preview', member: found };
   }
 
-  // 5. Search directory members
+  // 4. Search directory members
   const foundMember = members.find(m => 
     m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
     m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
@@ -82,12 +76,37 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   );
   if (foundMember) return { view: 'preview', member: foundMember };
 
-  // 6. Fallback for custom single profile when hash exists
+  // 5. Fallback for custom single profile when hash exists
   if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
     return { view: 'preview', member: activeProfile };
   }
 
-  return { view: 'preview' };
+  // 6. Generic card fallback if cleanHash is present (NEVER show homepage on hashtag scans!)
+  return { 
+    view: 'preview', 
+    member: {
+      id: cleanHash,
+      profile: {
+        name: cleanHash.replace(/_/g, ' '),
+        username: cleanHash,
+        title: 'Member Profile',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
+        bio: `Official Linktree bio card for @${cleanHash}.`,
+        verified: true,
+        statusText: '🚀 Active Member'
+      },
+      socials: [],
+      portfolio: [],
+      theme: {
+        id: 'midnight-glass',
+        name: 'Midnight Glass',
+        bgStyle: 'bg-preset-midnight',
+        accentColor: '#6366f1',
+        buttonRadius: 'rounded-2xl',
+        buttonGlow: true
+      }
+    }
+  };
 };
 
 export default function App() {
