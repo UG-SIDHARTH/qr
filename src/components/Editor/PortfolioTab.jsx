@@ -10,8 +10,10 @@ import {
   Code2
 } from 'lucide-react';
 
-export default function PortfolioTab({ portfolio, onChange }) {
+export default function PortfolioTab({ portfolio = [], onChange }) {
   const [editingId, setEditingId] = React.useState(null);
+
+  const safePortfolio = Array.isArray(portfolio) ? portfolio : [];
 
   const handleAddProject = () => {
     const newProject = {
@@ -24,18 +26,18 @@ export default function PortfolioTab({ portfolio, onChange }) {
       featured: true,
       stars: "100+"
     };
-    onChange([newProject, ...portfolio]);
+    onChange([newProject, ...safePortfolio]);
     setEditingId(newProject.id);
   };
 
   const handleUpdate = (id, field, value) => {
     onChange(
-      portfolio.map((p) => (p.id === id ? { ...p, [field]: value } : p))
+      safePortfolio.map((p) => (p.id === id ? { ...p, [field]: value } : p))
     );
   };
 
   const handleRemove = (id) => {
-    onChange(portfolio.filter((p) => p.id !== id));
+    onChange(safePortfolio.filter((p) => p.id !== id));
   };
 
   const handleTagsChange = (id, tagsString) => {

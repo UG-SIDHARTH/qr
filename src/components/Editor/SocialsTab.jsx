@@ -29,8 +29,10 @@ const PRESET_PLATFORMS = [
   { name: 'Website', platform: 'website', icon: 'Globe', color: '#4f46e5', defaultUrl: 'https://', subtitle: 'Personal Website' },
 ];
 
-export default function SocialsTab({ socials, onChange }) {
+export default function SocialsTab({ socials = [], onChange }) {
   const [editingId, setEditingId] = React.useState(null);
+
+  const safeSocials = Array.isArray(socials) ? socials : [];
 
   const handleAddSocial = (preset) => {
     const newSocial = {
@@ -44,7 +46,7 @@ export default function SocialsTab({ socials, onChange }) {
       enabled: true,
       badge: '',
     };
-    onChange([...socials, newSocial]);
+    onChange([...safeSocials, newSocial]);
     setEditingId(newSocial.id);
   };
 

@@ -14,10 +14,11 @@ import {
   Lock
 } from 'lucide-react';
 
-export default function ProfileTab({ profile, onChange }) {
+export default function ProfileTab({ profile = {}, onChange }) {
+  const p = profile || {};
   const handleChange = (field, value) => {
     onChange({
-      ...profile,
+      ...p,
       [field]: value
     });
   };
@@ -50,9 +51,9 @@ export default function ProfileTab({ profile, onChange }) {
         <label className="block text-xs font-medium text-slate-300">Profile Picture / Avatar</label>
         <div className="flex items-center space-x-4">
           <div className="relative group w-16 h-16 rounded-2xl overflow-hidden bg-slate-800 border-2 border-indigo-500/30 flex-shrink-0">
-            {profile.avatar ? (
+            {p.avatar ? (
               <img 
-                src={profile.avatar} 
+                src={p.avatar} 
                 alt="Avatar" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -69,7 +70,7 @@ export default function ProfileTab({ profile, onChange }) {
           <div className="flex-1 space-y-2">
             <input
               type="text"
-              value={profile.avatar}
+              value={p.avatar || ''}
               onChange={(e) => handleChange('avatar', e.target.value)}
               placeholder="Paste Image URL..."
               className="w-full px-3 py-1.5 glass-input rounded-xl text-xs"
@@ -100,7 +101,7 @@ export default function ProfileTab({ profile, onChange }) {
             <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="text"
-              value={profile.name}
+              value={p.name || ''}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="e.g. Sidharth Kumar"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -115,7 +116,7 @@ export default function ProfileTab({ profile, onChange }) {
             <AtSign className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="text"
-              value={profile.username}
+              value={p.username || ''}
               onChange={(e) => handleChange('username', e.target.value)}
               placeholder="e.g. sidharth_dev"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -130,7 +131,7 @@ export default function ProfileTab({ profile, onChange }) {
             <Briefcase className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="text"
-              value={profile.title}
+              value={p.title || ''}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder="e.g. Full Stack Developer & UI/UX Designer"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -145,7 +146,7 @@ export default function ProfileTab({ profile, onChange }) {
             <FileText className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <textarea
               rows={3}
-              value={profile.bio}
+              value={p.bio || ''}
               onChange={(e) => handleChange('bio', e.target.value)}
               placeholder="Write a brief intro about yourself..."
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm resize-none"
@@ -160,7 +161,7 @@ export default function ProfileTab({ profile, onChange }) {
             <Sparkles className="w-4 h-4 text-amber-400 absolute left-3 top-2.5" />
             <input
               type="text"
-              value={profile.statusText}
+              value={p.statusText || ''}
               onChange={(e) => handleChange('statusText', e.target.value)}
               placeholder="e.g. 🚀 Open for Full-Time Roles & Freelance"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -175,7 +176,7 @@ export default function ProfileTab({ profile, onChange }) {
             <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="email"
-              value={profile.email}
+              value={p.email || ''}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="sidharth@example.com"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -190,7 +191,7 @@ export default function ProfileTab({ profile, onChange }) {
             <Phone className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="text"
-              value={profile.phone}
+              value={p.phone || ''}
               onChange={(e) => handleChange('phone', e.target.value)}
               placeholder="+91 98765 43210"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -205,7 +206,7 @@ export default function ProfileTab({ profile, onChange }) {
             <MapPin className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="text"
-              value={profile.location}
+              value={p.location || ''}
               onChange={(e) => handleChange('location', e.target.value)}
               placeholder="e.g. Bangalore, India"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm"
@@ -221,7 +222,7 @@ export default function ProfileTab({ profile, onChange }) {
             <input
               type="text"
               maxLength={8}
-              value={profile.adminPin || '1234'}
+              value={p.adminPin || '1234'}
               onChange={(e) => handleChange('adminPin', e.target.value)}
               placeholder="Default: 1234"
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm font-mono"
@@ -237,13 +238,13 @@ export default function ProfileTab({ profile, onChange }) {
           </div>
           <button
             type="button"
-            onClick={() => handleChange('verified', !profile.verified)}
+            onClick={() => handleChange('verified', !p.verified)}
             className={`w-10 h-6 rounded-full p-1 transition-colors ${
-              profile.verified ? 'bg-indigo-600' : 'bg-slate-800'
+              p.verified ? 'bg-indigo-600' : 'bg-slate-800'
             }`}
           >
             <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
-              profile.verified ? 'translate-x-4' : 'translate-x-0'
+              p.verified ? 'translate-x-4' : 'translate-x-0'
             }`} />
           </button>
         </div>

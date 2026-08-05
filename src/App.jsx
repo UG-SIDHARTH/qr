@@ -444,35 +444,37 @@ export default function App() {
             <div className="min-h-[480px]">
               {activeTab === 'profile' && (
                 <ProfileTab 
-                  profile={profileData.profile} 
+                  profile={profileData?.profile || {}} 
                   onChange={handleUpdateProfile} 
                 />
               )}
 
               {activeTab === 'socials' && (
                 <SocialsTab 
-                  socials={profileData.socials || []} 
+                  socials={profileData?.socials || []} 
                   onChange={handleUpdateSocials} 
                 />
               )}
 
               {activeTab === 'portfolio' && (
                 <PortfolioTab 
-                  portfolio={profileData.portfolio || []} 
+                  portfolio={profileData?.portfolio || []} 
                   onChange={handleUpdatePortfolio} 
                 />
               )}
 
               {activeTab === 'theme' && (
                 <ThemeTab 
-                  theme={profileData.theme} 
+                  theme={profileData?.theme || {}} 
                   onChange={handleUpdateTheme} 
                 />
               )}
 
               {activeTab === 'qr' && (
                 <QRCodeTab 
-                  qrConfig={profileData.qrConfig} 
+                  qrConfig={profileData?.qrConfig || {}} 
+                  profile={profileData?.profile || {}}
+                  socials={profileData?.socials || []}
                   onChange={handleUpdateQR} 
                 />
               )}
