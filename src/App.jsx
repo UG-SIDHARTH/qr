@@ -14,7 +14,7 @@ import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { EMPTY_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl } from './utils/url';
+import { getProfileHash, getProfileUrl, decodeHashToProfile } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -39,10 +39,16 @@ const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   if (!hash) return { view: 'preview' };
 
+  // 1. Try decoding mobile payload from URL hash ?p= (Works cross-device on all mobile phones)
+  const decodedPayload = decodeHashToProfile(hash);
+  if (decodedPayload && (decodedPayload.profile?.name || decodedPayload.profile?.username)) {
+    return { view: 'preview', member: decodedPayload };
+  }
+
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
   if (!cleanHash) return { view: 'preview' };
 
-  // 1. Check system routes
+  // 2. Check system routes
   if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
     return { view: 'bulk' };
   }
@@ -50,7 +56,7 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     return { view: 'editor' };
   }
 
-  // 2. Check active single profile match
+  // 3. Check active single profile match
   if (activeProfile?.profile) {
     const p = activeProfile.profile;
     if (
@@ -61,14 +67,14 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     }
   }
 
-  // 3. Check user= ID lookup
+  // 4. Check user= ID lookup
   if (cleanHash.startsWith('user=')) {
     const userId = cleanHash.replace('user=', '').trim();
     const found = members.find(m => String(m.id) === userId || String(m.id) === `user_${userId}`);
     if (found) return { view: 'preview', member: found };
   }
 
-  // 4. Search directory members
+  // 5. Search directory members
   const foundMember = members.find(m => 
     m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
     m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
@@ -76,12 +82,12 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   );
   if (foundMember) return { view: 'preview', member: foundMember };
 
-  // 5. Fallback for custom single profile when hash exists
+  // 6. Mobile fallback for custom profile hash (e.g. #ug)
   if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
     return { view: 'preview', member: activeProfile };
   }
 
-  // 6. Generic card fallback if cleanHash is present (NEVER show homepage on hashtag scans!)
+  // 7. Generic mobile fallback card (NEVER show homepage on mobile hashtag scans!)
   return { 
     view: 'preview', 
     member: {
@@ -89,11 +95,11 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
       profile: {
         name: cleanHash.replace(/_/g, ' '),
         username: cleanHash,
-        title: 'Member Profile',
+        title: 'Digital Bio Card',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-        bio: `Official Linktree bio card for @${cleanHash}.`,
+        bio: `Welcome to @${cleanHash}'s mobile Linktree bio card.`,
         verified: true,
-        statusText: '🚀 Active Member'
+        statusText: '🚀 Active Mobile Card'
       },
       socials: [],
       portfolio: [],
@@ -185,38 +191,50 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [membersList, isUnlocked]);
 
-  // Save changes to localStorage & auto-sync user profiles to directory for Super Admin
+  // Save changes to localStorage & auto-sync user profiles to Super Admin directory
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
     } catch (e) {}
 
-    if (profileData.profile?.name || profileData.profile?.username) {
+    const name = profileData.profile?.name?.trim();
+    const username = profileData.profile?.username?.trim().toLowerCase().replace(/^#/, '');
+
+    if (name || username) {
       setMembersList(prev => {
-        const username = profileData.profile.username?.trim().toLowerCase();
-        const nameSlug = profileData.profile.name?.trim().toLowerCase().replace(/\s+/g, '_');
-        const id = profileData.id || username || nameSlug || 'user_custom';
+        const id = profileData.id || username || name.toLowerCase().replace(/\s+/g, '_') || 'user_custom';
 
         const existingIdx = prev.findIndex(m => 
           String(m.id) === String(id) ||
           (username && m.profile?.username?.toLowerCase() === username) ||
-          (nameSlug && m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === nameSlug)
+          (name && m.profile?.name?.toLowerCase() === name.toLowerCase())
         );
 
-        const updatedProfile = {
+        const updatedProfileRecord = {
           ...profileData,
           id: id,
-          employeeId: profileData.employeeId || 'USER-CUSTOM',
+          employeeId: profileData.employeeId || `USR-${Math.floor(1000 + Math.random() * 9000)}`,
           department: profileData.department || 'User Created',
+          profile: {
+            ...profileData.profile,
+            name: name || username || 'User Profile',
+            username: username || name?.toLowerCase().replace(/\s+/g, '_') || id,
+          }
         };
 
+        let newMembers;
         if (existingIdx >= 0) {
-          const newMembers = [...prev];
-          newMembers[existingIdx] = updatedProfile;
-          return newMembers;
+          newMembers = [...prev];
+          newMembers[existingIdx] = updatedProfileRecord;
         } else {
-          return [updatedProfile, ...prev];
+          newMembers = [updatedProfileRecord, ...prev];
         }
+
+        try {
+          localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
+        } catch (e) {}
+
+        return newMembers;
       });
     }
   }, [profileData]);

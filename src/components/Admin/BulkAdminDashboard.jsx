@@ -37,7 +37,7 @@ export default function BulkAdminDashboard({
   const isSuperAdmin = authRole === 'superadmin';
 
   // Departments list
-  const departments = ['All', 'Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Human Resources'];
+  const departments = ['All', 'User Created', 'Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Human Resources'];
 
   // Filtered members list based on search and department
   const filteredMembers = members.filter(m => {
