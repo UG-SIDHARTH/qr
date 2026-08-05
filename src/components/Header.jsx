@@ -1,15 +1,15 @@
 import React from 'react';
 import { 
-  Sparkles, 
-  Smartphone, 
-  Eye, 
   Share2, 
   Download, 
   RotateCcw, 
   QrCode,
-  Globe,
-  Upload,
-  Check
+  Check,
+  Lock,
+  Unlock,
+  KeyRound,
+  Eye,
+  Sliders
 } from 'lucide-react';
 
 export default function Header({ 
@@ -18,7 +18,9 @@ export default function Header({
   onOpenExport, 
   onReset, 
   onQuickQR,
-  profile 
+  profile,
+  isUnlocked,
+  onRequestUnlock
 }) {
   const [copied, setCopied] = React.useState(false);
 
@@ -44,44 +46,43 @@ export default function Header({
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-outfit font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-indigo-300">
-                LinkTree <span className="text-purple-400">&</span> QR Studio
-              </span>
-              <span className="px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full">
-                PRO
+                {profile?.name || "Bio Linktree"}
               </span>
             </div>
             <p className="text-xs text-slate-400 hidden sm:block">
-              All-in-one Bio, Socials, Portfolio & Contact QR Generator
+              {profile?.title || "Digital Profile & Portfolio"}
             </p>
           </div>
         </div>
 
-        {/* View Mode Toggle (Desktop & Tablet) */}
-        <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-1 shadow-inner">
-          <button
-            onClick={() => setViewMode('editor')}
-            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              viewMode === 'editor'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>Studio & Editor</span>
-          </button>
-          
-          <button
-            onClick={() => setViewMode('preview')}
-            className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              viewMode === 'preview'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-            }`}
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Public View</span>
-          </button>
-        </div>
+        {/* Studio View Controls (Only visible if creator is editing or unlocked) */}
+        {isUnlocked && (
+          <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-1 shadow-inner">
+            <button
+              onClick={() => setViewMode('preview')}
+              className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                viewMode === 'preview'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Public Preview</span>
+            </button>
+            
+            <button
+              onClick={() => setViewMode('editor')}
+              className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                viewMode === 'editor'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+              }`}
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Studio Editor</span>
+            </button>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
@@ -92,7 +93,7 @@ export default function Header({
             title="Scan or View QR Code"
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Quick QR</span>
+            <span className="hidden sm:inline">Show QR</span>
           </button>
 
           {/* Share Button */}
@@ -104,23 +105,40 @@ export default function Header({
             <span className="hidden sm:inline">{copied ? "Copied!" : "Share Link"}</span>
           </button>
 
-          {/* Export / Import Button */}
+          {/* Creator Lock / Unlock Status Button */}
           <button
-            onClick={onOpenExport}
-            className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all"
-            title="Export / Import Profile JSON"
+            onClick={onRequestUnlock}
+            className={`p-2 rounded-xl border transition-all ${
+              isUnlocked 
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20' 
+                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+            }`}
+            title={isUnlocked ? "Creator Studio Unlocked" : "Creator Admin Login"}
           >
-            <Download className="w-4 h-4" />
+            {isUnlocked ? <Unlock className="w-4 h-4 text-emerald-400" /> : <Lock className="w-4 h-4" />}
           </button>
 
-          {/* Reset Button */}
-          <button
-            onClick={onReset}
-            className="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-slate-400 hover:text-rose-400 rounded-xl transition-all"
-            title="Reset to Default Sample Data"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
+          {/* Export / Import Button (Unlocked Only) */}
+          {isUnlocked && (
+            <button
+              onClick={onOpenExport}
+              className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all"
+              title="Export / Import Profile JSON"
+            >
+              <Download className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Reset Button (Unlocked Only) */}
+          {isUnlocked && (
+            <button
+              onClick={onReset}
+              className="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-slate-400 hover:text-rose-400 rounded-xl transition-all"
+              title="Reset to Default Sample Data"
+            >
+              <RotateCcw className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
       </div>

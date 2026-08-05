@@ -10,7 +10,8 @@ import {
   BadgeCheck, 
   Image, 
   Sparkles,
-  Upload
+  Upload,
+  Lock
 } from 'lucide-react';
 
 export default function ProfileTab({ profile, onChange }) {
@@ -212,8 +213,24 @@ export default function ProfileTab({ profile, onChange }) {
           </div>
         </div>
 
+        {/* Creator Studio Security Passcode PIN */}
+        <div>
+          <label className="block text-xs font-medium text-slate-300 mb-1">Creator Security Passcode PIN</label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-indigo-400 absolute left-3 top-2.5" />
+            <input
+              type="text"
+              maxLength={8}
+              value={profile.adminPin || '1234'}
+              onChange={(e) => handleChange('adminPin', e.target.value)}
+              placeholder="Default: 1234"
+              className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm font-mono"
+            />
+          </div>
+        </div>
+
         {/* Verified Badge Toggle */}
-        <div className="flex items-center justify-between p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+        <div className="md:col-span-2 flex items-center justify-between p-3 bg-slate-900/60 rounded-xl border border-slate-800">
           <div className="flex items-center space-x-2">
             <BadgeCheck className="w-4 h-4 text-indigo-400" />
             <span className="text-xs font-medium text-slate-200">Show Verified Blue Checkmark</span>

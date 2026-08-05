@@ -10,6 +10,7 @@ export const DEFAULT_PROFILE = {
     phone: "+91 98765 43210",
     verified: true,
     statusText: "🚀 Open for Full-Time Roles & Freelance",
+    adminPin: "1234",
   },
   socials: [
     {
@@ -122,18 +123,58 @@ export const DEFAULT_PROFILE = {
     cardStyle: "glass-card",
     textColor: "#f8fafc",
     accentColor: "#a855f7",
-    buttonRadius: "rounded-2xl", // rounded-lg, rounded-2xl, rounded-full
+    buttonRadius: "rounded-2xl",
     fontFamily: "font-sans",
     buttonGlow: true,
     glassOpacity: "bg-slate-900/60",
   },
   qrConfig: {
-    mode: "url", // "url" | "vcard"
+    mode: "url",
     fgColor: "#a855f7",
     bgColor: "#090d16",
-    dotStyle: "rounded", // "square" | "rounded" | "dots"
+    dotStyle: "rounded",
     cornerStyle: "rounded",
     frameText: "SCAN TO VIEW MY BIO & PORTFOLIO",
+    frameColor: "#6366f1",
+    logoText: "⚡",
+    includeLogo: true,
+    errorCorrectionLevel: "H",
+  }
+};
+
+export const EMPTY_PROFILE = {
+  profile: {
+    name: "",
+    username: "",
+    title: "",
+    avatar: "",
+    bio: "",
+    location: "",
+    email: "",
+    phone: "",
+    verified: false,
+    statusText: "",
+    adminPin: "1234",
+  },
+  socials: [],
+  portfolio: [],
+  theme: {
+    id: "midnight-glass",
+    name: "Midnight Glass",
+    bgStyle: "bg-preset-midnight",
+    cardStyle: "glass-card",
+    accentColor: "#6366f1",
+    buttonRadius: "rounded-xl",
+    fontFamily: "font-sans",
+    buttonGlow: true,
+  },
+  qrConfig: {
+    mode: "url",
+    fgColor: "#a855f7",
+    bgColor: "#090d16",
+    dotStyle: "rounded",
+    cornerStyle: "rounded",
+    frameText: "SCAN TO VIEW BIO",
     frameColor: "#6366f1",
     logoText: "⚡",
     includeLogo: true,
