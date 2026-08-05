@@ -10,7 +10,7 @@ export const EMPTY_PROFILE = {
     phone: "",
     verified: false,
     statusText: "",
-    adminPin: "31072007",
+    adminPin: import.meta.env.VITE_ADMIN_PASSCODE || "123456",
   },
   socials: [],
   portfolio: [],

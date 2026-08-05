@@ -129,6 +129,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState(initialUrlState.view || 'preview');
   const [activeTab, setActiveTab] = useState('profile');
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [authRole, setAuthRole] = useState('none');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -157,7 +158,7 @@ export default function App() {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [membersList, isUnlocked, profileData.profile?.username, profileData.profile?.name]);
+  }, [membersList, isUnlocked]);
 
   // Save changes to localStorage & auto-sync user profiles to directory for Super Admin
   useEffect(() => {
@@ -231,7 +232,8 @@ export default function App() {
     }
   };
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = (role = 'admin') => {
+    setAuthRole(role);
     setIsUnlocked(true);
     setViewMode('bulk');
     window.history.replaceState(null, '', '#bulk');
@@ -324,6 +326,7 @@ export default function App() {
         <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
           <BulkAdminDashboard
             members={membersList}
+            authRole={authRole}
             onUpdateMembers={setMembersList}
             onSelectMemberToEdit={handleSelectMemberToEdit}
             onViewMemberProfile={handleViewMemberProfile}
@@ -466,7 +469,7 @@ export default function App() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={handleAuthSuccess}
-        currentPin={profileData.profile?.adminPin || "31072007"}
+        currentPin={profileData.profile?.adminPin || import.meta.env.VITE_ADMIN_PASSCODE || "123456"}
       />
 
       <QRModal 

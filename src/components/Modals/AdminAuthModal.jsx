@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Lock, KeyRound, X, Check, ShieldAlert, Sparkles } from 'lucide-react';
 
-export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin = "123456" }) {
+const ADMIN_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || "123456";
+const SUPER_ADMIN_PASSCODE = import.meta.env.VITE_SUPER_ADMIN_PASSCODE || "31072007";
+
+export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin = ADMIN_PASSCODE }) {
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState('');
 
@@ -11,10 +14,14 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin 
     e.preventDefault();
     setError('');
     
-    // Check Passcode PIN (123456)
-    if (pinInput.trim() === currentPin || pinInput.trim() === "123456") {
+    const pin = pinInput.trim();
+    if (pin === SUPER_ADMIN_PASSCODE) {
       setPinInput('');
-      onSuccess();
+      onSuccess('superadmin');
+      onClose();
+    } else if (pin === ADMIN_PASSCODE || pin === currentPin) {
+      setPinInput('');
+      onSuccess('admin');
       onClose();
     } else {
       setError('Incorrect Passcode PIN.');

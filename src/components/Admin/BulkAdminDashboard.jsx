@@ -24,6 +24,7 @@ import BatchQRExporter from './BatchQRExporter';
 
 export default function BulkAdminDashboard({ 
   members, 
+  authRole = 'admin',
   onUpdateMembers, 
   onSelectMemberToEdit, 
   onViewMemberProfile 
@@ -32,6 +33,8 @@ export default function BulkAdminDashboard({
   const [selectedDept, setSelectedDept] = useState('All');
   const [selectedIds, setSelectedIds] = useState([]);
   const [isExporterOpen, setIsExporterOpen] = useState(false);
+
+  const isSuperAdmin = authRole === 'superadmin';
 
   // Departments list
   const departments = ['All', 'Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'Human Resources'];
@@ -172,8 +175,12 @@ export default function BulkAdminDashboard({
       <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <div className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-extrabold rounded-full tracking-wider uppercase">
-              👑 Super Admin Access
+            <div className={`px-2.5 py-1 text-[10px] font-extrabold rounded-full tracking-wider uppercase flex items-center gap-1 border ${
+              isSuperAdmin 
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-300' 
+                : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
+            }`}>
+              <span>{isSuperAdmin ? '👑 Super Admin Access' : '🛡️ Admin Access'}</span>
             </div>
           </div>
           <h2 className="text-xl font-bold font-outfit text-white flex items-center gap-2 pt-1">
