@@ -95,40 +95,23 @@ export default function Header({
             <span className="hidden md:inline">{copied ? "Copied!" : "Share"}</span>
           </button>
 
-          {/* Creator Lock / Unlock Status Button */}
+          {/* Export / Import Button */}
           <button
-            onClick={onRequestUnlock}
-            className={`p-2 rounded-xl border transition-all ${
-              isUnlocked 
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20' 
-                : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
-            }`}
-            title={isUnlocked ? "Creator Studio Unlocked" : "Creator Admin Login"}
+            onClick={onOpenExport}
+            className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all hidden sm:flex"
+            title="Export / Import Profile JSON"
           >
-            {isUnlocked ? <Unlock className="w-4 h-4 text-emerald-400" /> : <Lock className="w-4 h-4" />}
+            <Download className="w-4 h-4" />
           </button>
 
-          {/* Export / Import Button (Unlocked Only) */}
-          {isUnlocked && (
-            <button
-              onClick={onOpenExport}
-              className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all hidden sm:flex"
-              title="Export / Import Profile JSON"
-            >
-              <Download className="w-4 h-4" />
-            </button>
-          )}
-
-          {/* Reset Button (Unlocked Only) */}
-          {isUnlocked && (
-            <button
-              onClick={onReset}
-              className="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-slate-400 hover:text-rose-400 rounded-xl transition-all hidden sm:flex"
-              title="Reset to Default Sample Data"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-          )}
+          {/* Reset Button */}
+          <button
+            onClick={onReset}
+            className="p-2 bg-slate-900 hover:bg-rose-950/40 border border-slate-800 hover:border-rose-800/40 text-slate-400 hover:text-rose-400 rounded-xl transition-all hidden sm:flex"
+            title="Reset Studio Data"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
         </div>
 
       </div>

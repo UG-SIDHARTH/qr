@@ -13,22 +13,33 @@ export default function PublishSuccessModal({ isOpen, onClose, profileData, onVi
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
 
-    QRCode.toCanvas(
-      canvasRef.current,
-      profileUrl,
-      {
-        width: 180,
-        margin: 2,
-        color: {
-          dark: qrConfig.fgColor || '#a855f7',
-          light: '#ffffff',
+    try {
+      QRCode.toCanvas(
+        canvasRef.current,
+        profileUrl || `${window.location.origin}#profile`,
+        {
+          width: 180,
+          margin: 2,
+          color: {
+            dark: qrConfig?.fgColor || '#a855f7',
+            light: '#ffffff',
+          },
+          errorCorrectionLevel: 'M',
         },
-        errorCorrectionLevel: 'H',
-      },
-      (err) => {
-        if (err) console.error("Publish QR Error:", err);
-      }
-    );
+        (err) => {
+          if (err) {
+            console.error("Publish QR Error:", err);
+            QRCode.toCanvas(
+              canvasRef.current,
+              profileUrl || `${window.location.origin}#profile`,
+              { width: 180, margin: 2, errorCorrectionLevel: 'L' }
+            ).catch(() => {});
+          }
+        }
+      );
+    } catch (e) {
+      console.error("Publish QR exception:", e);
+    }
   }, [isOpen, profileUrl, qrConfig]);
 
   if (!isOpen) return null;

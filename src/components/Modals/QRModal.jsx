@@ -9,29 +9,40 @@ export default function QRModal({ isOpen, onClose, profileData }) {
   const [copied, setCopied] = React.useState(false);
   const { profile, socials, qrConfig } = profileData;
 
-  const encodedData = qrConfig.mode === 'vcard' 
-    ? generateVCard(profile, socials)
-    : getProfileUrl(profile);
+  const encodedData = (qrConfig?.mode === 'vcard') 
+    ? (generateVCard(profile, socials) || getProfileUrl(profileData))
+    : getProfileUrl(profileData);
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
 
-    QRCode.toCanvas(
-      canvasRef.current,
-      encodedData,
-      {
-        width: 240,
-        margin: 2,
-        color: {
-          dark: qrConfig.fgColor || '#a855f7',
-          light: qrConfig.bgColor || '#090d16',
+    try {
+      QRCode.toCanvas(
+        canvasRef.current,
+        encodedData || `${window.location.origin}#profile`,
+        {
+          width: 240,
+          margin: 2,
+          color: {
+            dark: qrConfig?.fgColor || '#a855f7',
+            light: qrConfig?.bgColor || '#090d16',
+          },
+          errorCorrectionLevel: qrConfig?.errorCorrectionLevel || 'M',
         },
-        errorCorrectionLevel: qrConfig.errorCorrectionLevel || 'H',
-      },
-      (err) => {
-        if (err) console.error("QR Modal Error:", err);
-      }
-    );
+        (err) => {
+          if (err) {
+            console.error("QR Modal Render Warning:", err);
+            QRCode.toCanvas(
+              canvasRef.current,
+              encodedData || `${window.location.origin}#profile`,
+              { width: 240, margin: 2, errorCorrectionLevel: 'L' }
+            ).catch(() => {});
+          }
+        }
+      );
+    } catch (e) {
+      console.error("QR Modal exception:", e);
+    }
   }, [isOpen, qrConfig, encodedData]);
 
   if (!isOpen) return null;

@@ -383,56 +383,8 @@ export default function App() {
         memberCount={membersList.length}
       />
 
-      {/* Mode Navigation Bar (Bulk Admin vs Editor vs Public View) */}
-      {isUnlocked && (
-        <div className="w-full bg-slate-900 border-b border-slate-800 py-2.5 px-4">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => handleSetViewMode('bulk')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all ${
-                  viewMode === 'bulk'
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                <Users className="w-4 h-4 text-purple-300" />
-                <span>Bulk Admin Directory ({membersList.length} Members)</span>
-              </button>
-
-              <button
-                onClick={() => handleSetViewMode('editor')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all ${
-                  viewMode === 'editor'
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                <Sliders className="w-4 h-4 text-indigo-300" />
-                <span>Single Profile Studio</span>
-              </button>
-            </div>
-
-            <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-              Editing: <strong className="text-white">{profileData.profile?.name || 'Clean Profile'}</strong>
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Main View Layout */}
-      {viewMode === 'bulk' && isUnlocked ? (
-        // 100+ People Bulk Administrator Dashboard View
-        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
-          <BulkAdminDashboard
-            members={membersList}
-            authRole={authRole}
-            onUpdateMembers={setMembersList}
-            onSelectMemberToEdit={handleSelectMemberToEdit}
-            onViewMemberProfile={handleViewMemberProfile}
-          />
-        </main>
-      ) : viewMode === 'preview' ? (
+      {viewMode === 'preview' ? (
         // Front Page Welcome Landing vs Public Linktree View
         <main className="flex-1 w-full flex flex-col items-center justify-center relative">
           {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (
@@ -445,7 +397,6 @@ export default function App() {
             <WelcomeLanding
               onCreateLinktree={() => handleSetViewMode('editor')}
               onOpenQR={() => setIsQRModalOpen(true)}
-              onRequestUnlock={() => setIsAuthModalOpen(true)}
             />
           )}
         </main>

@@ -49,34 +49,24 @@ export default function WelcomeLanding({ onCreateLinktree, onOpenQR, onRequestUn
         </div>
 
         {/* Feature Highlights Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-800/80 text-left">
-          <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4 border-t border-slate-800/80 text-left">
+          <div className="p-3.5 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1">
             <div className="flex items-center space-x-1.5 text-xs font-bold text-indigo-300">
               <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Bio Cards</span>
+              <span>Bio Cards & Social Links</span>
             </div>
             <p className="text-[11px] text-slate-400 leading-snug">
-              Add links, custom badges, avatar, bio & themes.
+              Add custom links, avatar, bio, theme styles & portfolio projects.
             </p>
           </div>
 
-          <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1">
+          <div className="p-3.5 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1">
             <div className="flex items-center space-x-1.5 text-xs font-bold text-purple-300">
               <QrCode className="w-3.5 h-3.5 text-purple-400" />
-              <span>QR Generator</span>
+              <span>QR Generator & Sharing</span>
             </div>
             <p className="text-[11px] text-slate-400 leading-snug">
-              Download PNG/SVG QR codes with custom styling.
-            </p>
-          </div>
-
-          <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-1">
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-pink-300">
-              <Shield className="w-3.5 h-3.5 text-pink-400" />
-              <span>Bulk Admin</span>
-            </div>
-            <p className="text-[11px] text-slate-400 leading-snug">
-              Manage 100+ member linktrees and batch export.
+              Generate crisp, instant PNG QR codes & shareable links.
             </p>
           </div>
         </div>

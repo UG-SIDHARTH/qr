@@ -29,11 +29,12 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
 
   // Target content to encode based on mode
   const getEncodedContent = () => {
-    if (qrConfig.mode === 'vcard') {
-      return generateVCard(profile, socials);
+    if (qrConfig?.mode === 'vcard') {
+      const vcard = generateVCard(profile, socials);
+      if (vcard) return vcard;
     }
-    // Encodes clean Linktree bio page link with person's username
-    return getProfileUrl(profile);
+    const url = getProfileUrl(profile);
+    return url || `${window.location.origin}${window.location.pathname}#profile`;
   };
 
   const encodedData = getEncodedContent();
@@ -42,22 +43,34 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    QRCode.toCanvas(
-      canvasRef.current,
-      encodedData,
-      {
-        width: 260,
-        margin: 2,
-        color: {
-          dark: qrConfig.fgColor || '#a855f7',
-          light: qrConfig.bgColor || '#090d16',
+    try {
+      QRCode.toCanvas(
+        canvasRef.current,
+        encodedData || `${window.location.origin}#profile`,
+        {
+          width: 260,
+          margin: 2,
+          color: {
+            dark: qrConfig?.fgColor || '#a855f7',
+            light: qrConfig?.bgColor || '#090d16',
+          },
+          errorCorrectionLevel: qrConfig?.errorCorrectionLevel || 'M',
         },
-        errorCorrectionLevel: qrConfig.errorCorrectionLevel || 'H',
-      },
-      (err) => {
-        if (err) console.error("QR Code Error:", err);
-      }
-    );
+        (err) => {
+          if (err) {
+            console.error("QR Code Render Warning:", err);
+            // Fallback retry with basic error correction level
+            QRCode.toCanvas(
+              canvasRef.current,
+              encodedData || `${window.location.origin}#profile`,
+              { width: 260, margin: 2, errorCorrectionLevel: 'L' }
+            ).catch(() => {});
+          }
+        }
+      );
+    } catch (e) {
+      console.error("QR Canvas exception:", e);
+    }
   }, [qrConfig, encodedData]);
 
   // Download PNG
