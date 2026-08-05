@@ -172,13 +172,16 @@ export default function BulkAdminDashboard({
       <div className="p-6 bg-slate-900/60 rounded-3xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
         <div className="space-y-1">
           <div className="flex items-center space-x-2">
-            <Users className="w-6 h-6 text-indigo-400" />
-            <h2 className="text-xl font-bold font-outfit text-white">
-              100+ People Bulk QR Administrator Dashboard
-            </h2>
+            <div className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-extrabold rounded-full tracking-wider uppercase">
+              👑 Super Admin Access
+            </div>
           </div>
+          <h2 className="text-xl font-bold font-outfit text-white flex items-center gap-2 pt-1">
+            <Users className="w-6 h-6 text-indigo-400" />
+            <span>Master Directory & Super Admin Dashboard</span>
+          </h2>
           <p className="text-xs text-slate-400">
-            Manage organization members, auto-generate Linktree profiles & batch export QR codes for 100+ employees.
+            View & manage all dynamic user-created Linktrees and admin bulk records in one central database.
           </p>
         </div>
 

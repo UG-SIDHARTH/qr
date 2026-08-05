@@ -38,27 +38,50 @@ if (typeof window !== 'undefined' && window.localStorage) {
 }
 
 // Helper to resolve route and member from URL hash
-const resolveHashUrl = (hash, members = []) => {
+const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   if (!hash) return { view: 'preview' };
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).trim();
   if (!cleanHash) return { view: 'preview' };
 
+  // 1. Check if cleanHash matches active single profile
+  if (activeProfile?.profile) {
+    const p = activeProfile.profile;
+    if (
+      (p.username && p.username.toLowerCase() === cleanHash.toLowerCase()) ||
+      (p.name && p.name.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase())
+    ) {
+      return { view: 'preview', member: activeProfile };
+    }
+  }
+
+  // 2. Check system routes
+  if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
+    return { view: 'bulk' };
+  }
+  if (cleanHash === 'editor' || cleanHash === 'studio') {
+    return { view: 'editor' };
+  }
+
+  // 3. Check user= ID lookup
   if (cleanHash.startsWith('user=')) {
     const userId = cleanHash.replace('user=', '').trim();
     const found = members.find(m => String(m.id) === userId || String(m.id) === `user_${userId}`);
     if (found) return { view: 'preview', member: found };
-  } else if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
-    return { view: 'bulk' };
-  } else if (cleanHash === 'editor' || cleanHash === 'studio') {
-    return { view: 'editor' };
-  } else {
-    const foundMember = members.find(m => 
-      m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
-      m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
-      String(m.id).toLowerCase() === cleanHash.toLowerCase()
-    );
-    if (foundMember) return { view: 'preview', member: foundMember };
   }
+
+  // 4. Search directory members
+  const foundMember = members.find(m => 
+    m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
+    m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
+    String(m.id).toLowerCase() === cleanHash.toLowerCase()
+  );
+  if (foundMember) return { view: 'preview', member: foundMember };
+
+  // 5. Fallback for custom single profile when hash exists
+  if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
+    return { view: 'preview', member: activeProfile };
+  }
+
   return { view: 'preview' };
 };
 
@@ -77,6 +100,12 @@ export default function App() {
 
   // Current active profile data loaded from URL hash member, localStorage, or EMPTY_PROFILE
   const [profileData, setProfileData] = useState(() => {
+    let savedProfile = EMPTY_PROFILE;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) savedProfile = JSON.parse(saved);
+    } catch (e) {}
+
     const initialMembers = (() => {
       try {
         const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
@@ -88,17 +117,13 @@ export default function App() {
       return generate100Members();
     })();
 
-    const state = resolveHashUrl(typeof window !== 'undefined' ? window.location.hash : '', initialMembers);
+    const state = resolveHashUrl(typeof window !== 'undefined' ? window.location.hash : '', initialMembers, savedProfile);
     if (state.member) return state.member;
 
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch (e) {}
-    return EMPTY_PROFILE;
+    return savedProfile;
   });
 
-  const checkHashUrl = () => resolveHashUrl(window.location.hash, membersList);
+  const checkHashUrl = () => resolveHashUrl(window.location.hash, membersList, profileData);
 
   const initialUrlState = checkHashUrl();
   const [viewMode, setViewMode] = useState(initialUrlState.view || 'preview');
@@ -132,13 +157,42 @@ export default function App() {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [membersList, isUnlocked]);
+  }, [membersList, isUnlocked, profileData.profile?.username, profileData.profile?.name]);
 
-  // Save changes to localStorage
+  // Save changes to localStorage & auto-sync user profiles to directory for Super Admin
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
     } catch (e) {}
+
+    if (profileData.profile?.name || profileData.profile?.username) {
+      setMembersList(prev => {
+        const username = profileData.profile.username?.trim().toLowerCase();
+        const nameSlug = profileData.profile.name?.trim().toLowerCase().replace(/\s+/g, '_');
+        const id = profileData.id || username || nameSlug || 'user_custom';
+
+        const existingIdx = prev.findIndex(m => 
+          String(m.id) === String(id) ||
+          (username && m.profile?.username?.toLowerCase() === username) ||
+          (nameSlug && m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === nameSlug)
+        );
+
+        const updatedProfile = {
+          ...profileData,
+          id: id,
+          employeeId: profileData.employeeId || 'USER-CUSTOM',
+          department: profileData.department || 'User Created',
+        };
+
+        if (existingIdx >= 0) {
+          const newMembers = [...prev];
+          newMembers[existingIdx] = updatedProfile;
+          return newMembers;
+        } else {
+          return [updatedProfile, ...prev];
+        }
+      });
+    }
   }, [profileData]);
 
   useEffect(() => {
