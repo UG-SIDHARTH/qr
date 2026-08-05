@@ -14,7 +14,7 @@ import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { EMPTY_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl, decodeHashToProfile } from './utils/url';
+import { getProfileHash, getProfileUrl } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -30,20 +30,12 @@ import {
   Sparkles
 } from 'lucide-react';
 
-import { generate100Members } from './data/sample100Members';
-
 const STORAGE_KEY = 'qr_linktree_profile_data_v7';
 const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 
 // Helper to resolve route and member from URL hash
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   if (!hash) return { view: 'preview' };
-
-  // 1. Try decoding mobile payload from URL hash ?p= (Works cross-device on all mobile phones)
-  const decodedPayload = decodeHashToProfile(hash);
-  if (decodedPayload && (decodedPayload.profile?.name || decodedPayload.profile?.username)) {
-    return { view: 'preview', member: decodedPayload };
-  }
 
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
   if (!cleanHash) return { view: 'preview' };
