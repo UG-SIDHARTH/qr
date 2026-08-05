@@ -31,8 +31,8 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
     if (qrConfig.mode === 'vcard') {
       return generateVCard(profile, socials);
     }
-    // Default: Web page link
-    return window.location.href;
+    // Encodes clean Linktree bio page link
+    return `${window.location.origin}${window.location.pathname}#bio`;
   };
 
   const encodedData = getEncodedContent();
@@ -143,8 +143,8 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
               >
                 <Globe className="w-4 h-4 text-purple-400 mt-0.5" />
                 <div>
-                  <span className="block text-xs font-semibold">Linktree Page URL</span>
-                  <span className="text-[10px] opacity-75">Scans to open your live web profile</span>
+                  <span className="block text-xs font-semibold">Linktree Bio Page</span>
+                  <span className="text-[10px] opacity-75">Scans to open your clean Linktree page</span>
                 </div>
               </button>
 
@@ -273,7 +273,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
               {/* Center Logo Overlay */}
               {qrConfig.includeLogo && (
                 <div 
-                  className="absolute inset-0 m-auto w-10 h-10 rounded-xl bg-slate-950 border-2 border-indigo-500 flex items-center justify-center text-sm shadow-xl"
+                  className="absolute inset-0 m-auto w-10 h-10 rounded-xl bg-slate-950 border-2 flex items-center justify-center text-sm shadow-xl"
                   style={{ borderColor: qrConfig.fgColor }}
                 >
                   {qrConfig.logoText || '⚡'}

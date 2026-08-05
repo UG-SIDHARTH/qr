@@ -17,7 +17,8 @@ import {
   Palette, 
   QrCode, 
   Smartphone, 
-  Eye 
+  Eye,
+  Sliders
 } from 'lucide-react';
 
 const STORAGE_KEY = 'qr_linktree_profile_data_v1';
@@ -36,49 +37,76 @@ export default function App() {
     return DEFAULT_PROFILE;
   });
 
+  // Check URL hash for public view vs editor mode
+  const getInitialViewMode = () => {
+    const hash = window.location.hash.toLowerCase();
+    if (hash === '#bio' || hash === '#preview' || hash === '#public') {
+      return 'preview';
+    }
+    return 'editor';
+  };
+
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'socials' | 'portfolio' | 'theme' | 'qr'
-  const [viewMode, setViewMode] = useState('editor'); // 'editor' | 'preview'
+  const [viewMode, setViewMode] = useState(getInitialViewMode); // 'editor' | 'preview'
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Sync hash with view mode & handle hashchange
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#bio' || hash === '#preview' || hash === '#public') {
+        setViewMode('preview');
+      } else if (hash === '#editor' || hash === '#studio') {
+        setViewMode('editor');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleSetViewMode = (mode) => {
+    setViewMode(mode);
+    if (mode === 'preview') {
+      window.history.replaceState(null, '', '#bio');
+    } else {
+      window.history.replaceState(null, '', '#editor');
+    }
+  };
 
   // Auto-save to LocalStorage on change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
   }, [profileData]);
 
-  // Handler for Profile updates
+  // Handlers
   const handleUpdateProfile = (newProfile) => {
     setProfileData(prev => ({ ...prev, profile: newProfile }));
   };
 
-  // Handler for Socials updates
   const handleUpdateSocials = (newSocials) => {
     setProfileData(prev => ({ ...prev, socials: newSocials }));
   };
 
-  // Handler for Portfolio updates
   const handleUpdatePortfolio = (newPortfolio) => {
     setProfileData(prev => ({ ...prev, portfolio: newPortfolio }));
   };
 
-  // Handler for Theme updates
   const handleUpdateTheme = (newTheme) => {
     setProfileData(prev => ({ ...prev, theme: newTheme }));
   };
 
-  // Handler for QR Config updates
   const handleUpdateQR = (newQR) => {
     setProfileData(prev => ({ ...prev, qrConfig: newQR }));
   };
 
-  // Reset to default sample profile
   const handleReset = () => {
     if (window.confirm("Reset profile data back to original sample state?")) {
       setProfileData(DEFAULT_PROFILE);
     }
   };
 
-  // Import JSON handler
   const handleImport = (importedData) => {
     setProfileData(importedData);
   };
@@ -97,7 +125,7 @@ export default function App() {
       {/* Navigation Header */}
       <Header
         viewMode={viewMode}
-        setViewMode={setViewMode}
+        setViewMode={handleSetViewMode}
         onOpenExport={() => setIsExportModalOpen(true)}
         onReset={handleReset}
         onQuickQR={() => setIsQRModalOpen(true)}
@@ -106,8 +134,20 @@ export default function App() {
 
       {/* Main View Layout */}
       {viewMode === 'preview' ? (
-        // Standalone Full-screen Public View Mode
-        <main className="flex-1 w-full flex flex-col items-center justify-center">
+        // Standalone Full-screen Public Linktree View
+        <main className="flex-1 w-full flex flex-col items-center justify-center relative">
+          
+          {/* Floating Studio Edit Button on Public Linktree View */}
+          <div className="fixed bottom-6 right-6 z-40">
+            <button
+              onClick={() => handleSetViewMode('editor')}
+              className="px-4 py-2.5 bg-slate-900/90 hover:bg-slate-800 text-white font-medium text-xs rounded-full border border-slate-700 shadow-2xl backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
+            >
+              <Sliders className="w-4 h-4 text-indigo-400" />
+              <span>Customize Bio & QR</span>
+            </button>
+          </div>
+
           <BioPage 
             profileData={profileData} 
             onOpenQR={() => setIsQRModalOpen(true)} 
@@ -200,7 +240,7 @@ export default function App() {
                 Live Mobile Simulator
               </span>
               <button
-                onClick={() => setViewMode('preview')}
+                onClick={() => handleSetViewMode('preview')}
                 className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1"
               >
                 <Eye className="w-3.5 h-3.5" />

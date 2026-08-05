@@ -10,7 +10,7 @@ export default function QRModal({ isOpen, onClose, profileData }) {
 
   const encodedData = qrConfig.mode === 'vcard' 
     ? generateVCard(profile, socials)
-    : window.location.href;
+    : `${window.location.origin}${window.location.pathname}#bio`;
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
