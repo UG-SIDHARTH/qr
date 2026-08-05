@@ -14,7 +14,7 @@ import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { EMPTY_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl } from './utils/url';
+import { getProfileHash, getProfileUrl, decodeHashToProfile } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -35,18 +35,28 @@ import { generate100Members } from './data/sample100Members';
 const STORAGE_KEY = 'qr_linktree_profile_data_v7';
 const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 
-// Force clear all legacy browser local storage keys to guarantee 100% clean slate
-if (typeof window !== 'undefined' && window.localStorage) {
-  window.localStorage.clear();
-}
-
 // Helper to resolve route and member from URL hash
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   if (!hash) return { view: 'preview' };
-  const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).trim();
+
+  // 1. Try decoding compressed payload from URL hash (Works cross-device with 0 server)
+  const decodedPayload = decodeHashToProfile(hash);
+  if (decodedPayload && (decodedPayload.profile?.name || decodedPayload.profile?.username)) {
+    return { view: 'preview', member: decodedPayload };
+  }
+
+  const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
   if (!cleanHash) return { view: 'preview' };
 
-  // 1. Check if cleanHash matches active single profile
+  // 2. Check system routes
+  if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
+    return { view: 'bulk' };
+  }
+  if (cleanHash === 'editor' || cleanHash === 'studio') {
+    return { view: 'editor' };
+  }
+
+  // 3. Check active single profile match
   if (activeProfile?.profile) {
     const p = activeProfile.profile;
     if (
@@ -57,22 +67,14 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     }
   }
 
-  // 2. Check system routes
-  if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
-    return { view: 'bulk' };
-  }
-  if (cleanHash === 'editor' || cleanHash === 'studio') {
-    return { view: 'editor' };
-  }
-
-  // 3. Check user= ID lookup
+  // 4. Check user= ID lookup
   if (cleanHash.startsWith('user=')) {
     const userId = cleanHash.replace('user=', '').trim();
     const found = members.find(m => String(m.id) === userId || String(m.id) === `user_${userId}`);
     if (found) return { view: 'preview', member: found };
   }
 
-  // 4. Search directory members
+  // 5. Search directory members
   const foundMember = members.find(m => 
     m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
     m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
@@ -80,7 +82,7 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   );
   if (foundMember) return { view: 'preview', member: foundMember };
 
-  // 5. Fallback for custom single profile when hash exists
+  // 6. Fallback for custom single profile when hash exists
   if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
     return { view: 'preview', member: activeProfile };
   }
