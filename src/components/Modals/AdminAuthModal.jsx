@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, KeyRound, X, Check, ShieldAlert, Sparkles } from 'lucide-react';
 
-export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin = "31072007" }) {
+export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin = "123456" }) {
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState('');
 
@@ -11,8 +11,8 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin 
     e.preventDefault();
     setError('');
     
-    // Check Passcode PIN (31072007)
-    if (pinInput.trim() === currentPin || pinInput.trim() === "31072007") {
+    // Check Passcode PIN (123456)
+    if (pinInput.trim() === currentPin || pinInput.trim() === "123456") {
       setPinInput('');
       onSuccess();
       onClose();
