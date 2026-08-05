@@ -95,11 +95,11 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
       profile: {
         name: cleanHash.replace(/_/g, ' '),
         username: cleanHash,
-        title: 'Digital Bio Card',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400',
-        bio: `Welcome to @${cleanHash}'s mobile Linktree bio card.`,
-        verified: true,
-        statusText: '🚀 Active Mobile Card'
+        title: '',
+        avatar: '',
+        bio: '',
+        verified: false,
+        statusText: ''
       },
       socials: [],
       portfolio: [],
@@ -117,15 +117,16 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
 
 export default function App() {
   // Members directory list loaded from localStorage or default 100 members
+  // Members directory list loaded from localStorage or empty array
   const [membersList, setMembersList] = useState(() => {
     try {
       const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
-    return generate100Members();
+    return [];
   });
 
   // Current active profile data loaded from URL hash member, localStorage, or EMPTY_PROFILE
@@ -141,10 +142,10 @@ export default function App() {
         const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed)) return parsed;
         }
       } catch (e) {}
-      return generate100Members();
+      return [];
     })();
 
     const state = resolveHashUrl(typeof window !== 'undefined' ? window.location.hash : '', initialMembers, savedProfile);
@@ -456,8 +457,8 @@ export default function App() {
           <div className="lg:col-span-7 bg-slate-900/50 border border-slate-800 rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-6">
             
             {/* Header controls for tabs */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
+              <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0 py-0.5">
                 {TABS.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
@@ -465,7 +466,7 @@ export default function App() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                      className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0 ${
                         isActive
                           ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -486,22 +487,21 @@ export default function App() {
               </div>
 
               {/* Action Buttons: Publish & Delete */}
-              <div className="flex items-center space-x-2 flex-shrink-0">
+              <div className="flex items-center justify-end space-x-2 flex-shrink-0 border-t sm:border-t-0 sm:border-l border-slate-800 pt-2 sm:pt-0 sm:pl-3">
                 <button
                   onClick={handlePublishProfile}
-                  className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/30 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95"
+                  className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/30 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95 whitespace-nowrap"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin" />
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   <span>Finish & Publish</span>
                 </button>
 
                 <button
                   onClick={handleClearAllData}
-                  className="px-2.5 py-1.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-medium flex items-center space-x-1 transition-all"
-                  title="Wipe & Delete All Data"
+                  className="p-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-medium flex items-center transition-all"
+                  title="Wipe & Reset Studio Data"
                 >
-                  <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                  <span className="hidden sm:inline">Delete All</span>
+                  <Trash2 className="w-4 h-4 text-rose-400" />
                 </button>
               </div>
             </div>
