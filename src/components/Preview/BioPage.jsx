@@ -79,9 +79,11 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
           {/* Title / Name */}
           <div className="space-y-1">
             <div className="flex items-center justify-center space-x-1.5">
-              <h1 className="text-2xl sm:text-3xl font-extrabold font-outfit text-white tracking-tight">
-                {profile.name || "CEAL Clubs"}
-              </h1>
+              {profile.name && (
+                <h1 className="text-2xl sm:text-3xl font-extrabold font-outfit text-white tracking-tight">
+                  {profile.name}
+                </h1>
+              )}
               {profile.verified && (
                 <BadgeCheck className="w-5 h-5 text-indigo-400 fill-indigo-400/20" />
               )}
@@ -122,25 +124,6 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
               <span>{profile.location}</span>
             </div>
           )}
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-center space-x-2 pt-1">
-            <button
-              onClick={handleSaveContact}
-              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/30 flex items-center space-x-1.5 transition-all transform active:scale-95"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Save Contact</span>
-            </button>
-
-            <button
-              onClick={onOpenQR}
-              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium rounded-xl border border-slate-700 flex items-center space-x-1.5 transition-all active:scale-95"
-            >
-              <QrCode className="w-3.5 h-3.5" />
-              <span>Show QR</span>
-            </button>
-          </div>
 
         </div>
 
@@ -193,14 +176,6 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
             );
           })}
 
-          {activeSocials.length === 0 && (
-            <div className="text-center py-8 px-4 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-400 text-xs space-y-1">
-              <p className="font-semibold text-slate-300">No links added yet</p>
-              <p className="text-[11px] text-slate-500">
-                Use the Studio Editor to add custom link cards like FOSS Cell, IEEE, IEDC, and ISTE.
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Portfolio Showcase Grid */}
@@ -267,14 +242,13 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
         )}
 
         {/* Footer */}
-        <div className="pt-4 border-t border-slate-800/80 text-center space-y-1">
-          <p className="text-[11px] text-slate-400 font-medium">
-            powered by <span className="font-bold text-slate-200">train303</span> and <span className="font-bold text-slate-200">deploy505</span>
-          </p>
-          <p className="text-[10px] text-slate-500">
-            {profile.footerText || "College of Engineering Attingal, IHRD, Kerala"}
-          </p>
-        </div>
+        {profile.footerText && (
+          <div className="pt-4 border-t border-slate-800/80 text-center">
+            <p className="text-[10px] text-slate-500">
+              {profile.footerText}
+            </p>
+          </div>
+        )}
 
       </div>
     </div>

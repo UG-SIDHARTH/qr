@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, KeyRound, X, Check, ShieldAlert, Sparkles } from 'lucide-react';
 
-export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin = "1234" }) {
+export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin = "31072007" }) {
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState('');
 
@@ -11,13 +11,13 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin 
     e.preventDefault();
     setError('');
     
-    // Check PIN (default is 1234 or creator PIN)
-    if (pinInput.trim() === currentPin || pinInput.trim() === "1234" || pinInput.trim() === "admin") {
+    // Check Passcode PIN (31072007)
+    if (pinInput.trim() === currentPin || pinInput.trim() === "31072007") {
       setPinInput('');
       onSuccess();
       onClose();
     } else {
-      setError('Incorrect Creator PIN. Try "1234" or your custom PIN.');
+      setError('Incorrect Passcode PIN.');
     }
   };
 
@@ -42,7 +42,7 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin 
             Creator Studio Access
           </h3>
           <p className="text-xs text-slate-400">
-            Enter your Creator Passcode PIN to access the profile editor & QR generator.
+            Enter your passcode PIN to access the Bulk Admin Directory.
           </p>
         </div>
 
@@ -50,13 +50,13 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1">
-              Passcode PIN (Default: <code className="text-indigo-400 font-mono">1234</code>)
+              Passcode PIN
             </label>
             <div className="relative">
               <KeyRound className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
               <input
                 type="password"
-                maxLength={8}
+                maxLength={12}
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
                 placeholder="Enter PIN..."
@@ -78,13 +78,9 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess, currentPin 
             className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-1.5"
           >
             <Check className="w-4 h-4" />
-            <span>Unlock Editor Studio</span>
+            <span>Unlock Admin Access</span>
           </button>
         </form>
-
-        <p className="text-[10px] text-center text-slate-500">
-          Default creator passcode is <span className="font-mono text-indigo-400">1234</span>
-        </p>
 
       </div>
     </div>

@@ -7,6 +7,7 @@ import ThemeTab from './components/Editor/ThemeTab';
 import QRCodeTab from './components/Editor/QRCodeTab';
 import PhoneMockup from './components/Preview/PhoneMockup';
 import BioPage from './components/Preview/BioPage';
+import WelcomeLanding from './components/Preview/WelcomeLanding';
 import QRModal from './components/Modals/QRModal';
 import ExportModal from './components/Modals/ExportModal';
 import AdminAuthModal from './components/Modals/AdminAuthModal';
@@ -26,38 +27,78 @@ import {
   Trash2
 } from 'lucide-react';
 
-const STORAGE_KEY = 'qr_linktree_profile_data_v4';
-const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v4';
+import { generate100Members } from './data/sample100Members';
+
+const STORAGE_KEY = 'qr_linktree_profile_data_v7';
+const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 
 // Force clear all legacy browser local storage keys to guarantee 100% clean slate
 if (typeof window !== 'undefined' && window.localStorage) {
   window.localStorage.clear();
 }
 
+// Helper to resolve route and member from URL hash
+const resolveHashUrl = (hash, members = []) => {
+  if (!hash) return { view: 'preview' };
+  const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).trim();
+  if (!cleanHash) return { view: 'preview' };
+
+  if (cleanHash.startsWith('user=')) {
+    const userId = cleanHash.replace('user=', '').trim();
+    const found = members.find(m => String(m.id) === userId || String(m.id) === `user_${userId}`);
+    if (found) return { view: 'preview', member: found };
+  } else if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
+    return { view: 'bulk' };
+  } else if (cleanHash === 'editor' || cleanHash === 'studio') {
+    return { view: 'editor' };
+  } else {
+    const foundMember = members.find(m => 
+      m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
+      m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
+      String(m.id).toLowerCase() === cleanHash.toLowerCase()
+    );
+    if (foundMember) return { view: 'preview', member: foundMember };
+  }
+  return { view: 'preview' };
+};
+
 export default function App() {
-  // Members directory list defaults to empty array []
-  const [membersList, setMembersList] = useState([]);
-
-  // Current active profile data defaults to EMPTY_PROFILE
-  const [profileData, setProfileData] = useState(EMPTY_PROFILE);
-
-  const checkHashUrl = () => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#user=')) {
-      const userId = hash.replace('#user=', '');
-      const found = membersList.find(m => m.id === userId);
-      if (found) {
-        return { view: 'preview', member: found };
+  // Members directory list loaded from localStorage or default 100 members
+  const [membersList, setMembersList] = useState(() => {
+    try {
+      const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    }
-    if (hash === '#bulk' || hash === '#admin' || hash === '#members') {
-      return { view: 'bulk' };
-    }
-    if (hash === '#editor' || hash === '#studio') {
-      return { view: 'editor' };
-    }
-    return { view: 'preview' };
-  };
+    } catch (e) {}
+    return generate100Members();
+  });
+
+  // Current active profile data loaded from URL hash member, localStorage, or EMPTY_PROFILE
+  const [profileData, setProfileData] = useState(() => {
+    const initialMembers = (() => {
+      try {
+        const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return generate100Members();
+    })();
+
+    const state = resolveHashUrl(typeof window !== 'undefined' ? window.location.hash : '', initialMembers);
+    if (state.member) return state.member;
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return EMPTY_PROFILE;
+  });
+
+  const checkHashUrl = () => resolveHashUrl(window.location.hash, membersList);
 
   const initialUrlState = checkHashUrl();
   const [viewMode, setViewMode] = useState(initialUrlState.view || 'preview');
@@ -67,7 +108,7 @@ export default function App() {
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // Sync state with URL hash
+  // Sync state with URL hash on mount and hashchange
   useEffect(() => {
     const handleHashChange = () => {
       const state = checkHashUrl();
@@ -81,15 +122,13 @@ export default function App() {
           setViewMode('bulk');
         }
       } else if (state.view === 'editor') {
-        if (!isUnlocked) {
-          setIsAuthModalOpen(true);
-        } else {
-          setViewMode('editor');
-        }
+        setViewMode('editor');
       } else {
         setViewMode('preview');
       }
     };
+
+    handleHashChange();
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
@@ -130,7 +169,7 @@ export default function App() {
   };
 
   const handleSetViewMode = (mode) => {
-    if ((mode === 'editor' || mode === 'bulk') && !isUnlocked) {
+    if (mode === 'bulk' && !isUnlocked) {
       setIsAuthModalOpen(true);
     } else {
       setViewMode(mode);
@@ -237,13 +276,21 @@ export default function App() {
           />
         </main>
       ) : viewMode === 'preview' ? (
-        // Standalone Public Linktree View
+        // Front Page Welcome Landing vs Public Linktree View
         <main className="flex-1 w-full flex flex-col items-center justify-center relative">
-          <BioPage 
-            profileData={profileData} 
-            onOpenQR={() => setIsQRModalOpen(true)} 
-            isFullView={true} 
-          />
+          {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (
+            <BioPage 
+              profileData={profileData} 
+              onOpenQR={() => setIsQRModalOpen(true)} 
+              isFullView={true} 
+            />
+          ) : (
+            <WelcomeLanding
+              onCreateLinktree={() => handleSetViewMode('editor')}
+              onOpenQR={() => setIsQRModalOpen(true)}
+              onRequestUnlock={() => setIsAuthModalOpen(true)}
+            />
+          )}
         </main>
       ) : (
         // Studio & Editor Mode (Split Pane)
@@ -365,7 +412,7 @@ export default function App() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={handleAuthSuccess}
-        currentPin={profileData.profile?.adminPin || "1234"}
+        currentPin={profileData.profile?.adminPin || "31072007"}
       />
 
       <QRModal 

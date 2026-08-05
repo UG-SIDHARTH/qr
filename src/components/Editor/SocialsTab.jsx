@@ -21,13 +21,12 @@ import {
 } from 'lucide-react';
 
 const PRESET_PLATFORMS = [
-  { name: 'FOSS Cell', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Free & Open Source Software' },
-  { name: 'IEEE Student Branch', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Advancing Technology for Humanity' },
-  { name: 'Alchemy IEDC', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Innovation & Entrepreneurship' },
-  { name: 'ISTE', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Technical Education Excellence' },
-  { name: 'TinkerHub CEAL', platform: 'custom', icon: 'Globe', color: '#1e293b', defaultUrl: 'https://', subtitle: 'Tinkering, Innovation & Community' },
   { name: 'GitHub', platform: 'github', icon: 'Github', color: '#333333', defaultUrl: 'https://github.com/', subtitle: 'Open Source Repositories' },
   { name: 'LinkedIn', platform: 'linkedin', icon: 'Linkedin', color: '#0a66c2', defaultUrl: 'https://linkedin.com/in/', subtitle: 'Professional Network' },
+  { name: 'Twitter / X', platform: 'twitter', icon: 'Twitter', color: '#1da1f2', defaultUrl: 'https://x.com/', subtitle: 'Social Profile' },
+  { name: 'Instagram', platform: 'instagram', icon: 'Instagram', color: '#e1306c', defaultUrl: 'https://instagram.com/', subtitle: 'Photos & Stories' },
+  { name: 'YouTube', platform: 'youtube', icon: 'Youtube', color: '#ff0000', defaultUrl: 'https://youtube.com/@', subtitle: 'Video Channel' },
+  { name: 'Website', platform: 'website', icon: 'Globe', color: '#4f46e5', defaultUrl: 'https://', subtitle: 'Personal Website' },
 ];
 
 export default function SocialsTab({ socials, onChange }) {
@@ -76,13 +75,13 @@ export default function SocialsTab({ socials, onChange }) {
           Clubs, Social Media & Custom Link Cards
         </h3>
         <p className="text-xs text-slate-400 mt-1">
-          Add link cards with titles, subtitles, and destination URLs (matching CEAL Clubs model).
+          Add link cards with titles, subtitles, and destination URLs.
         </p>
       </div>
 
       {/* Preset Quick Add Buttons */}
       <div className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-2">
-        <label className="block text-xs font-medium text-slate-300">Quick Add CEAL Club Presets</label>
+        <label className="block text-xs font-medium text-slate-300">Quick Add Link Presets</label>
         <div className="flex flex-wrap gap-2">
           {PRESET_PLATFORMS.map((preset) => (
             <button
@@ -258,7 +257,7 @@ export default function SocialsTab({ socials, onChange }) {
 
         {socials.length === 0 && (
           <div className="text-center py-8 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-500 text-xs">
-            No link cards added yet. Click one of the CEAL Club presets above!
+            No link cards added yet. Click one of the presets above to add your first link!
           </div>
         )}
       </div>

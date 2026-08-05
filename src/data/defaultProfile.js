@@ -10,7 +10,7 @@ export const EMPTY_PROFILE = {
     phone: "",
     verified: false,
     statusText: "",
-    adminPin: "1234",
+    adminPin: "31072007",
   },
   socials: [],
   portfolio: [],

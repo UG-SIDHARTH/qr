@@ -45,47 +45,28 @@ export default function Header({
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-outfit font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-indigo-300">
-                {profile?.name || "Bio Linktree"}
+              <span className="font-outfit font-bold text-base sm:text-lg text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400">
+                Welcome to OpenSource Linktree
               </span>
             </div>
             <p className="text-xs text-slate-400 hidden sm:block">
-              {profile?.title || "Digital Profile & Portfolio"}
+              Create & Share Your Digital Bio Card & QR Code
             </p>
           </div>
         </div>
 
-        {/* Studio View Controls (Only visible if creator is editing or unlocked) */}
-        {isUnlocked && (
-          <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-1 shadow-inner">
-            <button
-              onClick={() => setViewMode('preview')}
-              className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                viewMode === 'preview'
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-              }`}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Public Preview</span>
-            </button>
-            
-            <button
-              onClick={() => setViewMode('editor')}
-              className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                viewMode === 'editor'
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Studio Editor</span>
-            </button>
-          </div>
-        )}
-
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
+          
+          {/* Create Your Linktree Button for Users */}
+          <button
+            onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
+            className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>{viewMode === 'editor' ? 'View Card Preview' : '+ Create Your Linktree'}</span>
+          </button>
+
           {/* Quick QR Button */}
           <button
             onClick={onQuickQR}

@@ -5,7 +5,9 @@ import { X, Printer, Download, Sparkles, UserCheck } from 'lucide-react';
 function SingleMemberQRCard({ member }) {
   const canvasRef = useRef(null);
   const { profile, qrConfig } = member;
-  const profileUrl = `${window.location.origin}${window.location.pathname}#user=${member.id}`;
+  const profileUrl = profile?.username 
+    ? `${window.location.origin}${window.location.pathname}#${profile.username}`
+    : `${window.location.origin}${window.location.pathname}#user=${member.id}`;
 
   useEffect(() => {
     if (!canvasRef.current) return;

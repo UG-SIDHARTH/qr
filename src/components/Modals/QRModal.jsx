@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { X, Download, Copy, Check, QrCode, UserPlus } from 'lucide-react';
 import { downloadVCard, generateVCard } from '../../utils/vcard';
+import { getProfileUrl } from '../../utils/url';
 
 export default function QRModal({ isOpen, onClose, profileData }) {
   const canvasRef = useRef(null);
@@ -10,7 +11,7 @@ export default function QRModal({ isOpen, onClose, profileData }) {
 
   const encodedData = qrConfig.mode === 'vcard' 
     ? generateVCard(profile, socials)
-    : `${window.location.origin}${window.location.pathname}#bio`;
+    : getProfileUrl(profile);
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;

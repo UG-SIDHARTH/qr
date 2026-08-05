@@ -14,6 +14,7 @@ import {
   Share2
 } from 'lucide-react';
 import { generateVCard } from '../../utils/vcard';
+import { getProfileUrl } from '../../utils/url';
 
 export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
   const canvasRef = useRef(null);
@@ -31,8 +32,8 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
     if (qrConfig.mode === 'vcard') {
       return generateVCard(profile, socials);
     }
-    // Encodes clean Linktree bio page link
-    return `${window.location.origin}${window.location.pathname}#bio`;
+    // Encodes clean Linktree bio page link with person's username
+    return getProfileUrl(profile);
   };
 
   const encodedData = getEncodedContent();

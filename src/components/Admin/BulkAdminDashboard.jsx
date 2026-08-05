@@ -327,7 +327,9 @@ export default function BulkAdminDashboard({
             <tbody className="divide-y divide-slate-800/60 text-xs">
               {filteredMembers.map((member) => {
                 const isSelected = selectedIds.includes(member.id);
-                const profileUrl = `${window.location.origin}${window.location.pathname}#user=${member.id}`;
+                const profileUrl = member.profile?.username 
+                  ? `${window.location.origin}${window.location.pathname}#${member.profile.username}`
+                  : `${window.location.origin}${window.location.pathname}#user=${member.id}`;
 
                 return (
                   <tr 
