@@ -429,14 +429,6 @@ export default function App() {
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                   <span>Finish & Publish</span>
                 </button>
-
-                <button
-                  onClick={handleClearAllData}
-                  className="p-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-medium flex items-center transition-all"
-                  title="Wipe & Reset Studio Data"
-                >
-                  <Trash2 className="w-4 h-4 text-rose-400" />
-                </button>
               </div>
             </div>
 
