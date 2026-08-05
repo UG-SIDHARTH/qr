@@ -43,6 +43,10 @@ const ICON_MAP = {
 export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
   const { profile = {}, socials = [], portfolio = [], theme = {} } = profileData;
 
+  const buttonRadius = theme.buttonRadius || 'rounded-2xl';
+  const accentColor = theme.accentColor || '#6366f1';
+  const buttonGlow = theme.buttonGlow !== false;
+
   const handleSaveContact = () => {
     downloadVCard(profile, socials);
   };
@@ -63,7 +67,7 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
             <div className="relative group mb-1">
               <div 
                 className="absolute -inset-1 rounded-full blur-md opacity-60 group-hover:opacity-100 transition duration-300 animate-pulse-glow"
-                style={{ backgroundColor: theme.accentColor || '#6366f1' }}
+                style={{ backgroundColor: accentColor }}
               />
               <img
                 src={profile.avatar}
@@ -98,21 +102,21 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
 
           {/* Headline Title */}
           {profile.title && (
-            <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+            <p className="text-xs font-semibold text-slate-300 tracking-wide uppercase px-3 py-1 bg-slate-800/60 rounded-full border border-slate-700/60">
               {profile.title}
             </p>
           )}
 
           {/* Bio / Description */}
           {profile.bio && (
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm px-2">
+            <p className="text-xs text-slate-300 leading-relaxed max-w-sm">
               {profile.bio}
             </p>
           )}
 
           {/* Status Banner */}
           {profile.statusText && (
-            <div className="px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-[11px] font-medium inline-flex items-center space-x-1.5 shadow-sm">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-300 text-xs font-medium">
               <span>{profile.statusText}</span>
             </div>
           )}
@@ -137,14 +141,17 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative w-full p-4 bg-[#141a29] hover:bg-[#1a2235] border border-slate-800/80 hover:border-slate-600 rounded-2xl flex items-center justify-between transition-all duration-300 shadow-md transform hover:-translate-y-0.5"
+                className={`group relative w-full p-4 bg-[#141a29] hover:bg-[#1a2235] border border-slate-800/80 hover:border-slate-600 ${buttonRadius} flex items-center justify-between transition-all duration-300 shadow-md transform hover:-translate-y-0.5`}
+                style={{
+                  boxShadow: buttonGlow ? `0 0 12px ${accentColor}25` : 'none',
+                }}
               >
                 <div className="flex items-center space-x-3.5 min-w-0">
                   {/* Optional Icon */}
                   {social.icon && (
                     <div 
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform group-hover:scale-105"
-                      style={{ backgroundColor: social.color || theme.accentColor || '#6366f1' }}
+                      className={`w-10 h-10 ${buttonRadius === 'rounded-full' ? 'rounded-full' : 'rounded-xl'} flex items-center justify-center text-white shadow-md flex-shrink-0 transition-transform group-hover:scale-105`}
+                      style={{ backgroundColor: social.color || accentColor }}
                     >
                       <IconComponent className="w-5 h-5" />
                     </div>
@@ -196,7 +203,10 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group bg-[#141a29] hover:bg-[#1a2235] border border-slate-800 rounded-2xl p-3.5 flex gap-3 transition-all duration-300"
+                  className={`group bg-[#141a29] hover:bg-[#1a2235] border border-slate-800 ${buttonRadius} p-3.5 flex gap-3 transition-all duration-300`}
+                  style={{
+                    boxShadow: buttonGlow ? `0 0 10px ${accentColor}15` : 'none',
+                  }}
                 >
                   {project.image && (
                     <img

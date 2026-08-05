@@ -11,8 +11,10 @@ import WelcomeLanding from './components/Preview/WelcomeLanding';
 import QRModal from './components/Modals/QRModal';
 import ExportModal from './components/Modals/ExportModal';
 import AdminAuthModal from './components/Modals/AdminAuthModal';
+import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { EMPTY_PROFILE } from './data/defaultProfile';
+import { getProfileHash, getProfileUrl } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -24,7 +26,8 @@ import {
   Sliders,
   Users,
   Building2,
-  Trash2
+  Trash2,
+  Sparkles
 } from 'lucide-react';
 
 import { generate100Members } from './data/sample100Members';
@@ -133,6 +136,7 @@ export default function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
   // Sync state with URL hash on mount and hashchange
   useEffect(() => {
@@ -259,6 +263,18 @@ export default function App() {
     window.history.replaceState(null, '', `#user=${member.id}`);
   };
 
+  const handlePublishProfile = () => {
+    if (!profileData.profile?.name && !profileData.profile?.username) {
+      alert("Please enter at least your Name or Username in your profile before publishing!");
+      return;
+    }
+    const hash = getProfileHash(profileData.profile);
+    if (hash) {
+      window.history.replaceState(null, '', hash);
+    }
+    setIsPublishModalOpen(true);
+  };
+
   const TABS = [
     { id: 'profile', label: 'Bio & Details', icon: User },
     { id: 'socials', label: 'Social Links', icon: Share2, count: profileData.socials?.length || 0 },
@@ -277,6 +293,7 @@ export default function App() {
         onOpenExport={() => setIsExportModalOpen(true)}
         onReset={handleClearAllData}
         onQuickQR={() => setIsQRModalOpen(true)}
+        onPublish={handlePublishProfile}
         profile={profileData.profile}
         isUnlocked={isUnlocked}
         onRequestUnlock={() => setIsAuthModalOpen(true)}
@@ -386,15 +403,25 @@ export default function App() {
                 })}
               </div>
 
-              {/* Clear All Data Button */}
-              <button
-                onClick={handleClearAllData}
-                className="px-2.5 py-1.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-medium flex items-center space-x-1 transition-all flex-shrink-0"
-                title="Wipe & Delete All Data"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                <span className="hidden sm:inline">Delete All</span>
-              </button>
+              {/* Action Buttons: Publish & Delete */}
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                <button
+                  onClick={handlePublishProfile}
+                  className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/30 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin" />
+                  <span>Finish & Publish</span>
+                </button>
+
+                <button
+                  onClick={handleClearAllData}
+                  className="px-2.5 py-1.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-medium flex items-center space-x-1 transition-all"
+                  title="Wipe & Delete All Data"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                  <span className="hidden sm:inline">Delete All</span>
+                </button>
+              </div>
             </div>
 
             {/* Active Tab Panel */}
@@ -431,34 +458,34 @@ export default function App() {
                 <QRCodeTab 
                   qrConfig={profileData.qrConfig} 
                   onChange={handleUpdateQR} 
-                  profile={profileData.profile}
-                  socials={profileData.socials || []}
                 />
               )}
             </div>
 
           </div>
 
-          {/* Right Column: Live Mobile Preview */}
-          <div className="lg:col-span-5 sticky top-20 flex flex-col items-center justify-center">
-            <div className="w-full flex items-center justify-between px-2 mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
-                Live Mobile Simulator
-              </span>
-              <button
-                onClick={() => handleSetViewMode('preview')}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Full Page View</span>
-              </button>
-            </div>
+          {/* Right Live Phone Simulator */}
+          <div className="hidden lg:flex flex-col items-center">
+            <div className="sticky top-24">
+              <div className="text-center mb-3 flex items-center justify-between px-2">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
+                  Live Mobile Simulator
+                </span>
+                <button
+                  onClick={() => setViewMode('preview')}
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  Full Page View
+                </button>
+              </div>
 
-            <PhoneMockup 
-              profileData={profileData} 
-              onOpenQR={() => setIsQRModalOpen(true)} 
-            />
+              <PhoneMockup 
+                profileData={profileData} 
+                onOpenQR={() => setIsQRModalOpen(true)} 
+              />
+            </div>
           </div>
 
         </main>
@@ -483,6 +510,13 @@ export default function App() {
         onClose={() => setIsExportModalOpen(false)} 
         profileData={profileData} 
         onImport={setProfileData} 
+      />
+
+      <PublishSuccessModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        profileData={profileData}
+        onViewLive={() => setViewMode('preview')}
       />
 
     </div>

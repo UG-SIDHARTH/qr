@@ -18,6 +18,7 @@ export default function Header({
   onOpenExport, 
   onReset, 
   onQuickQR,
+  onPublish,
   profile,
   isUnlocked,
   onRequestUnlock
@@ -58,13 +59,23 @@ export default function Header({
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
           
-          {/* Create Your Linktree Button for Users */}
+          {/* Publish / Finish Button in Editor Mode */}
+          {viewMode === 'editor' && (
+            <button
+              onClick={onPublish}
+              className="flex items-center space-x-1.5 px-4 py-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white text-xs font-extrabold rounded-xl shadow-lg shadow-emerald-500/25 transition-all transform active:scale-95 border border-emerald-400/30 animate-pulse"
+            >
+              <span>🚀 Publish Linktree</span>
+            </button>
+          )}
+
+          {/* Create Your Linktree / View Card Button */}
           <button
             onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
             className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95"
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>{viewMode === 'editor' ? 'View Card Preview' : '+ Create Your Linktree'}</span>
+            <span>{viewMode === 'editor' ? 'Card Preview' : '+ Create Linktree'}</span>
           </button>
 
           {/* Quick QR Button */}

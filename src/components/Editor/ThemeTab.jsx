@@ -2,10 +2,22 @@ import React from 'react';
 import { Palette, Sparkles, Layout, Type, CircleDot } from 'lucide-react';
 import { THEME_PRESETS } from '../../data/defaultProfile';
 
-export default function ThemeTab({ theme, onChange }) {
+export default function ThemeTab({ theme = {}, onChange }) {
+  const currentTheme = {
+    id: 'midnight-glass',
+    name: 'Midnight Glass',
+    bgStyle: 'bg-preset-midnight',
+    cardStyle: 'glass-card',
+    accentColor: '#6366f1',
+    buttonRadius: 'rounded-2xl',
+    fontFamily: 'font-sans',
+    buttonGlow: true,
+    ...theme,
+  };
+
   const handleSelectPreset = (preset) => {
     onChange({
-      ...theme,
+      ...currentTheme,
       id: preset.id,
       name: preset.name,
       bgStyle: preset.bgStyle,
@@ -17,7 +29,7 @@ export default function ThemeTab({ theme, onChange }) {
 
   const handleUpdate = (field, value) => {
     onChange({
-      ...theme,
+      ...currentTheme,
       [field]: value,
     });
   };
@@ -82,7 +94,7 @@ export default function ThemeTab({ theme, onChange }) {
               key={radius.value}
               onClick={() => handleUpdate('buttonRadius', radius.value)}
               className={`py-2 px-3 text-xs font-medium border transition-all ${
-                theme.buttonRadius === radius.value
+                currentTheme.buttonRadius === radius.value
                   ? 'border-indigo-500 bg-indigo-600/20 text-indigo-300'
                   : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200'
               } ${radius.value}`}
@@ -98,13 +110,13 @@ export default function ThemeTab({ theme, onChange }) {
           <div className="flex items-center space-x-3">
             <input
               type="color"
-              value={theme.accentColor || '#6366f1'}
+              value={currentTheme.accentColor || '#6366f1'}
               onChange={(e) => handleUpdate('accentColor', e.target.value)}
               className="w-10 h-10 rounded-xl cursor-pointer bg-transparent border-0"
             />
             <input
               type="text"
-              value={theme.accentColor || '#6366f1'}
+              value={currentTheme.accentColor || '#6366f1'}
               onChange={(e) => handleUpdate('accentColor', e.target.value)}
               className="flex-1 px-3 py-2 glass-input rounded-xl text-xs font-mono"
             />
@@ -119,13 +131,13 @@ export default function ThemeTab({ theme, onChange }) {
           </div>
           <button
             type="button"
-            onClick={() => handleUpdate('buttonGlow', !theme.buttonGlow)}
+            onClick={() => handleUpdate('buttonGlow', !currentTheme.buttonGlow)}
             className={`w-10 h-6 rounded-full p-1 transition-colors ${
-              theme.buttonGlow ? 'bg-indigo-600' : 'bg-slate-800'
+              currentTheme.buttonGlow ? 'bg-indigo-600' : 'bg-slate-800'
             }`}
           >
             <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
-              theme.buttonGlow ? 'translate-x-4' : 'translate-x-0'
+              currentTheme.buttonGlow ? 'translate-x-4' : 'translate-x-0'
             }`} />
           </button>
         </div>
