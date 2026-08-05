@@ -10,7 +10,8 @@ import BioPage from './components/Preview/BioPage';
 import QRModal from './components/Modals/QRModal';
 import ExportModal from './components/Modals/ExportModal';
 import AdminAuthModal from './components/Modals/AdminAuthModal';
-import { DEFAULT_PROFILE, EMPTY_PROFILE } from './data/defaultProfile';
+import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
+import { EMPTY_PROFILE } from './data/defaultProfile';
 import { 
   User, 
   Share2, 
@@ -19,47 +20,67 @@ import {
   QrCode, 
   Smartphone, 
   Eye,
-  Lock,
-  Unlock,
   Sliders,
+  Users,
+  Building2,
   Trash2
 } from 'lucide-react';
 
-const STORAGE_KEY = 'qr_linktree_profile_data_v1';
+const STORAGE_KEY = 'qr_linktree_profile_data_v4';
+const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v4';
+
+// Force clear all legacy browser local storage keys to guarantee 100% clean slate
+if (typeof window !== 'undefined' && window.localStorage) {
+  window.localStorage.clear();
+}
 
 export default function App() {
-  const [profileData, setProfileData] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse saved profile data:", e);
+  // Members directory list defaults to empty array []
+  const [membersList, setMembersList] = useState([]);
+
+  // Current active profile data defaults to EMPTY_PROFILE
+  const [profileData, setProfileData] = useState(EMPTY_PROFILE);
+
+  const checkHashUrl = () => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#user=')) {
+      const userId = hash.replace('#user=', '');
+      const found = membersList.find(m => m.id === userId);
+      if (found) {
+        return { view: 'preview', member: found };
       }
     }
-    return DEFAULT_PROFILE;
-  });
-
-  const getInitialViewMode = () => {
-    const hash = window.location.hash.toLowerCase();
-    if (hash === '#editor' || hash === '#studio' || hash === '#admin') {
-      return 'editor';
+    if (hash === '#bulk' || hash === '#admin' || hash === '#members') {
+      return { view: 'bulk' };
     }
-    return 'preview';
+    if (hash === '#editor' || hash === '#studio') {
+      return { view: 'editor' };
+    }
+    return { view: 'preview' };
   };
 
+  const initialUrlState = checkHashUrl();
+  const [viewMode, setViewMode] = useState(initialUrlState.view || 'preview');
   const [activeTab, setActiveTab] = useState('profile');
-  const [viewMode, setViewMode] = useState(getInitialViewMode);
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isQRModalOpen, setIsQRModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // Sync hash with view mode & handle hashchange
+  // Sync state with URL hash
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.toLowerCase();
-      if (hash === '#editor' || hash === '#studio' || hash === '#admin') {
+      const state = checkHashUrl();
+      if (state.member) {
+        setProfileData(state.member);
+        setViewMode('preview');
+      } else if (state.view === 'bulk') {
+        if (!isUnlocked) {
+          setIsAuthModalOpen(true);
+        } else {
+          setViewMode('bulk');
+        }
+      } else if (state.view === 'editor') {
         if (!isUnlocked) {
           setIsAuthModalOpen(true);
         } else {
@@ -72,38 +93,22 @@ export default function App() {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [isUnlocked]);
+  }, [membersList, isUnlocked]);
 
-  const handleRequestEditorAccess = () => {
-    if (isUnlocked) {
-      setViewMode('editor');
-      window.history.replaceState(null, '', '#editor');
-    } else {
-      setIsAuthModalOpen(true);
-    }
-  };
-
-  const handleSetViewMode = (mode) => {
-    if (mode === 'editor' && !isUnlocked) {
-      setIsAuthModalOpen(true);
-    } else {
-      setViewMode(mode);
-      window.history.replaceState(null, '', mode === 'preview' ? '#bio' : '#editor');
-    }
-  };
-
-  const handleAuthSuccess = () => {
-    setIsUnlocked(true);
-    setViewMode('editor');
-    window.history.replaceState(null, '', '#editor');
-  };
-
-  // Auto-save to LocalStorage on change
+  // Save changes to localStorage
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
+    } catch (e) {}
   }, [profileData]);
 
-  // Handlers
+  useEffect(() => {
+    try {
+      localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(membersList));
+    } catch (e) {}
+  }, [membersList]);
+
+  // Handlers for profile updates
   const handleUpdateProfile = (newProfile) => {
     setProfileData(prev => ({ ...prev, profile: newProfile }));
   };
@@ -124,28 +129,45 @@ export default function App() {
     setProfileData(prev => ({ ...prev, qrConfig: newQR }));
   };
 
-  // Wipe / Delete everything and start completely blank
+  const handleSetViewMode = (mode) => {
+    if ((mode === 'editor' || mode === 'bulk') && !isUnlocked) {
+      setIsAuthModalOpen(true);
+    } else {
+      setViewMode(mode);
+      window.history.replaceState(null, '', `#${mode}`);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setIsUnlocked(true);
+    setViewMode('bulk');
+    window.history.replaceState(null, '', '#bulk');
+  };
+
   const handleClearAllData = () => {
-    if (window.confirm("⚠️ Are you sure you want to DELETE ALL DATA?\nThis will erase all profile details, social links, portfolio cards, and custom themes.")) {
-      localStorage.removeItem(STORAGE_KEY);
-      setProfileData(EMPTY_PROFILE);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.clear();
     }
+    setProfileData(EMPTY_PROFILE);
+    setMembersList([]);
   };
 
-  const handleResetSample = () => {
-    if (window.confirm("Reset back to initial sample demo data?")) {
-      setProfileData(DEFAULT_PROFILE);
-    }
+  const handleSelectMemberToEdit = (member) => {
+    setProfileData(member);
+    setViewMode('editor');
+    window.history.replaceState(null, '', '#editor');
   };
 
-  const handleImport = (importedData) => {
-    setProfileData(importedData);
+  const handleViewMemberProfile = (member) => {
+    setProfileData(member);
+    setViewMode('preview');
+    window.history.replaceState(null, '', `#user=${member.id}`);
   };
 
   const TABS = [
     { id: 'profile', label: 'Bio & Details', icon: User },
-    { id: 'socials', label: 'Social Links', icon: Share2, count: profileData.socials.length },
-    { id: 'portfolio', label: 'Portfolio Cards', icon: FolderGit2, count: profileData.portfolio?.length },
+    { id: 'socials', label: 'Social Links', icon: Share2, count: profileData.socials?.length || 0 },
+    { id: 'portfolio', label: 'Portfolio Cards', icon: FolderGit2, count: profileData.portfolio?.length || 0 },
     { id: 'theme', label: 'Theme Studio', icon: Palette },
     { id: 'qr', label: 'QR Generator', icon: QrCode },
   ];
@@ -163,26 +185,60 @@ export default function App() {
         profile={profileData.profile}
         isUnlocked={isUnlocked}
         onRequestUnlock={() => setIsAuthModalOpen(true)}
+        memberCount={membersList.length}
       />
 
-      {/* Main View Layout */}
-      {viewMode === 'preview' ? (
-        // Standalone Full-screen Public Linktree View
-        <main className="flex-1 w-full flex flex-col items-center justify-center relative">
-          
-          {/* Creator Studio Return Button (Only shown if unlocked) */}
-          {isUnlocked && (
-            <div className="fixed bottom-6 right-6 z-40">
+      {/* Mode Navigation Bar (Bulk Admin vs Editor vs Public View) */}
+      {isUnlocked && (
+        <div className="w-full bg-slate-900 border-b border-slate-800 py-2.5 px-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => handleSetViewMode('bulk')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all ${
+                  viewMode === 'bulk'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                <Users className="w-4 h-4 text-purple-300" />
+                <span>Bulk Admin Directory ({membersList.length} Members)</span>
+              </button>
+
               <button
                 onClick={() => handleSetViewMode('editor')}
-                className="px-4 py-2.5 bg-slate-900/90 hover:bg-slate-800 text-white font-medium text-xs rounded-full border border-slate-700 shadow-2xl backdrop-blur-xl flex items-center space-x-2 transition-all transform hover:scale-105 active:scale-95"
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all ${
+                  viewMode === 'editor'
+                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                }`}
               >
-                <Sliders className="w-4 h-4 text-indigo-400" />
-                <span>Return to Studio Editor</span>
+                <Sliders className="w-4 h-4 text-indigo-300" />
+                <span>Single Profile Studio</span>
               </button>
             </div>
-          )}
 
+            <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
+              Editing: <strong className="text-white">{profileData.profile?.name || 'Clean Profile'}</strong>
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Main View Layout */}
+      {viewMode === 'bulk' && isUnlocked ? (
+        // 100+ People Bulk Administrator Dashboard View
+        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+          <BulkAdminDashboard
+            members={membersList}
+            onUpdateMembers={setMembersList}
+            onSelectMemberToEdit={handleSelectMemberToEdit}
+            onViewMemberProfile={handleViewMemberProfile}
+          />
+        </main>
+      ) : viewMode === 'preview' ? (
+        // Standalone Public Linktree View
+        <main className="flex-1 w-full flex flex-col items-center justify-center relative">
           <BioPage 
             profileData={profileData} 
             onOpenQR={() => setIsQRModalOpen(true)} 
@@ -196,7 +252,7 @@ export default function App() {
           {/* Left Column: Editor Dashboard */}
           <div className="lg:col-span-7 bg-slate-900/50 border border-slate-800 rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-6">
             
-            {/* Header controls for clearing data */}
+            {/* Header controls for tabs */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto no-scrollbar">
                 {TABS.map((tab) => {
@@ -248,7 +304,7 @@ export default function App() {
 
               {activeTab === 'socials' && (
                 <SocialsTab 
-                  socials={profileData.socials} 
+                  socials={profileData.socials || []} 
                   onChange={handleUpdateSocials} 
                 />
               )}
@@ -272,7 +328,7 @@ export default function App() {
                   qrConfig={profileData.qrConfig} 
                   onChange={handleUpdateQR} 
                   profile={profileData.profile}
-                  socials={profileData.socials}
+                  socials={profileData.socials || []}
                 />
               )}
             </div>
@@ -322,7 +378,7 @@ export default function App() {
         isOpen={isExportModalOpen} 
         onClose={() => setIsExportModalOpen(false)} 
         profileData={profileData} 
-        onImport={handleImport} 
+        onImport={setProfileData} 
       />
 
     </div>

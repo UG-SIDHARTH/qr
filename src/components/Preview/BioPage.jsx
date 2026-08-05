@@ -17,7 +17,8 @@ import {
   Mail,
   MessageSquare,
   Music,
-  Star
+  Star,
+  User
 } from 'lucide-react';
 import { downloadVCard } from '../../utils/vcard';
 
@@ -34,11 +35,13 @@ const ICON_MAP = {
 };
 
 export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
-  const { profile, socials, portfolio, theme } = profileData;
+  const { profile, socials = [], portfolio = [], theme = {} } = profileData;
 
   const handleSaveContact = () => {
     downloadVCard(profile, socials);
   };
+
+  const activeSocials = socials.filter(s => s.enabled);
 
   return (
     <div className={`w-full min-h-full flex flex-col items-center ${theme.bgStyle || 'bg-preset-midnight'} p-4 sm:p-6 transition-all`}>
@@ -53,30 +56,41 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
               className="absolute -inset-1 rounded-full blur-md opacity-70 group-hover:opacity-100 transition duration-300 animate-pulse-glow"
               style={{ backgroundColor: theme.accentColor || '#6366f1' }}
             />
-            <img
-              src={profile.avatar}
-              alt={profile.name}
-              className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-slate-900 shadow-2xl"
-              onError={(e) => {
-                e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400";
-              }}
-            />
+            {profile.avatar ? (
+              <img
+                src={profile.avatar}
+                alt={profile.name || "Profile"}
+                className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-slate-900 shadow-2xl"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div 
+              className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-slate-900 border-4 border-slate-800 flex items-center justify-center text-slate-500 shadow-2xl"
+              style={{ display: profile.avatar ? 'none' : 'flex' }}
+            >
+              <User className="w-12 h-12 text-slate-600" />
+            </div>
           </div>
 
           {/* Name & Handle */}
           <div className="space-y-1">
             <div className="flex items-center justify-center space-x-1.5">
               <h1 className="text-xl sm:text-2xl font-bold font-outfit text-white tracking-tight">
-                {profile.name}
+                {profile.name || "Your Name Here"}
               </h1>
               {profile.verified && (
                 <BadgeCheck className="w-5 h-5 text-indigo-400 fill-indigo-400/20" />
               )}
             </div>
             
-            <p className="text-xs font-mono text-indigo-300">
-              @{profile.username}
-            </p>
+            {profile.username && (
+              <p className="text-xs font-mono text-indigo-300">
+                @{profile.username}
+              </p>
+            )}
           </div>
 
           {/* Title / Profession */}
@@ -131,7 +145,7 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
 
         {/* Social Links List */}
         <div className="space-y-3 w-full">
-          {socials.filter(s => s.enabled).map((social) => {
+          {activeSocials.map((social) => {
             const IconComponent = ICON_MAP[social.icon] || Globe;
             return (
               <a
@@ -170,6 +184,15 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
               </a>
             );
           })}
+
+          {activeSocials.length === 0 && (
+            <div className="text-center py-8 px-4 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-400 text-xs space-y-1">
+              <p className="font-semibold text-slate-300">No social links added yet</p>
+              <p className="text-[11px] text-slate-500">
+                Use the Studio Editor to add your GitHub, LinkedIn, X/Twitter, or custom links.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Portfolio Showcase Grid */}
@@ -192,14 +215,16 @@ export default function BioPage({ profileData, onOpenQR, isFullView = false }) {
                   rel="noopener noreferrer"
                   className={`group ${theme.cardStyle || 'glass-card'} rounded-2xl p-3 flex gap-3 transition-all duration-300 hover:border-emerald-500/40`}
                 >
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-20 h-20 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform"
-                    onError={(e) => {
-                      e.target.src = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600";
-                    }}
-                  />
+                  {project.image && (
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-20 h-20 rounded-xl object-cover border border-white/10 flex-shrink-0 group-hover:scale-105 transition-transform"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  )}
 
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
