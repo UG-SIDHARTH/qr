@@ -280,13 +280,11 @@ export default function BioPage({ profileData = {}, onOpenQR, isFullView = false
         )}
 
         {/* Footer */}
-        {profile.footerText && (
-          <div className="pt-4 border-t border-slate-800/80 text-center">
-            <p className="text-[10px] text-slate-500">
-              {profile.footerText}
-            </p>
-          </div>
-        )}
+        <div className="pt-4 border-t border-slate-800/80 text-center">
+          <p className="text-[11px] text-slate-400 font-medium">
+            {profile.footerText || "© UG_SIDHARTH"}
+          </p>
+        </div>
 
       </div>
     </div>

@@ -540,6 +540,11 @@ export default function App() {
         onViewLive={() => setViewMode('preview')}
       />
 
+      {/* Global Copyright Footer */}
+      <footer className="w-full py-3.5 border-t border-slate-900 bg-slate-950/95 text-center text-xs text-slate-400 font-medium">
+        <span>© {new Date().getFullYear()} <strong className="text-indigo-300 font-bold">UG_SIDHARTH</strong>. All rights reserved.</span>
+      </footer>
+
     </div>
   );
 }

@@ -71,6 +71,13 @@ export default function WelcomeLanding({ onCreateLinktree, onOpenQR, onRequestUn
           </div>
         </div>
 
+        {/* Copyright Footer */}
+        <div className="pt-4 border-t border-slate-800/80 text-center">
+          <p className="text-xs text-slate-400 font-medium">
+            © UG_SIDHARTH
+          </p>
+        </div>
+
       </div>
     </div>
   );
