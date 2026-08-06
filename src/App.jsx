@@ -268,11 +268,20 @@ export default function App() {
     }
   };
 
-  const handleAuthSuccess = (role = 'admin') => {
+  const handleAuthSuccess = (role = 'admin', userMember = null) => {
     setAuthRole(role);
     setIsUnlocked(true);
-    setViewMode('bulk');
-    window.history.replaceState(null, '', '#bulk');
+    if (userMember) {
+      setProfileData(userMember);
+    }
+    const targetMode = role === 'superadmin' ? 'bulk' : 'editor';
+    setViewMode(targetMode);
+    window.history.replaceState(null, '', `#${targetMode}`);
+  };
+
+  const handleRegisterUser = (newUser) => {
+    setMembersList(prev => [newUser, ...prev]);
+    setProfileData(newUser);
   };
 
   const handleSelectMemberToEdit = (member) => {
@@ -506,6 +515,8 @@ export default function App() {
         isOpen={isAuthModalOpen} 
         onClose={() => setIsAuthModalOpen(false)} 
         onSuccess={handleAuthSuccess}
+        membersList={membersList}
+        onRegisterUser={handleRegisterUser}
         currentPin={profileData.profile?.adminPin || import.meta.env.VITE_ADMIN_PASSCODE || "123456"}
       />
 

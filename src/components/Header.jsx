@@ -95,6 +95,20 @@ export default function Header({
             <span className="hidden md:inline">{copied ? "Copied!" : "Share"}</span>
           </button>
 
+          {/* Log In / Create Account Button */}
+          <button
+            onClick={onRequestUnlock}
+            className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
+              isUnlocked 
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20' 
+                : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20'
+            } whitespace-nowrap`}
+            title={isUnlocked ? "Account Logged In" : "Log In / Create Account"}
+          >
+            {isUnlocked ? <Unlock className="w-3.5 h-3.5 text-emerald-400" /> : <Lock className="w-3.5 h-3.5 text-indigo-400" />}
+            <span className="hidden sm:inline">{isUnlocked ? "Account Active" : "Log In / Sign Up"}</span>
+          </button>
+
           {/* Export / Import Button */}
           <button
             onClick={onOpenExport}

@@ -153,7 +153,7 @@ export default function BioPage({ profileData = {}, onOpenQR, isFullView = false
               className="w-full py-2.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/20 border border-emerald-400/30 flex items-center justify-center space-x-2 transition-all transform active:scale-95 group"
             >
               <UserPlus className="w-4 h-4 text-emerald-300 group-hover:scale-110 transition-transform" />
-              <span>📇 Save to Phone Contacts (vCard)</span>
+              <span>Save to Phone Contacts (vCard)</span>
             </button>
           </div>
 

@@ -214,17 +214,16 @@ export default function ProfileTab({ profile = {}, onChange }) {
           </div>
         </div>
 
-        {/* Creator Studio Security Passcode PIN */}
+        {/* Account Security Password */}
         <div>
-          <label className="block text-xs font-medium text-slate-300 mb-1">Creator Security Passcode PIN</label>
+          <label className="block text-xs font-medium text-slate-300 mb-1">Account Password</label>
           <div className="relative">
             <Lock className="w-4 h-4 text-indigo-400 absolute left-3 top-2.5" />
             <input
               type="text"
-              maxLength={8}
               value={p.adminPin || '1234'}
               onChange={(e) => handleChange('adminPin', e.target.value)}
-              placeholder="Default: 1234"
+              placeholder="Account password..."
               className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm font-mono"
             />
           </div>
