@@ -60,13 +60,22 @@ export default function AdminAuthModal({
       return;
     }
 
-    // 1. PIN or Super Admin Passcode match
-    if (trimmedPass === SUPER_ADMIN_PASSCODE || trimmedLogin === SUPER_ADMIN_PASSCODE) {
+    // 1. Super Admin check
+    if (
+      trimmedPass === SUPER_ADMIN_PASSCODE || 
+      (trimmedLogin === 'superadmin' && (trimmedPass === SUPER_ADMIN_PASSCODE || !trimmedPass))
+    ) {
       onSuccess('superadmin');
       handleClose();
       return;
     }
-    if (trimmedPass === ADMIN_PASSCODE || trimmedPass === currentPin || trimmedLogin === ADMIN_PASSCODE) {
+
+    // 2. Admin check
+    if (
+      trimmedPass === ADMIN_PASSCODE || 
+      trimmedPass === currentPin || 
+      (trimmedLogin === 'admin' && (trimmedPass === ADMIN_PASSCODE || !trimmedPass))
+    ) {
       onSuccess('admin');
       handleClose();
       return;
