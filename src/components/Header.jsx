@@ -2,28 +2,30 @@ import React from 'react';
 import { 
   Share2, 
   Download, 
-  RotateCcw, 
   QrCode,
   Check,
   Lock,
   Unlock,
-  KeyRound,
-  Eye,
-  Sliders
+  Sliders,
+  Network,
+  LayoutDashboard,
+  Link2,
+  BarChart3,
+  Settings,
+  Sparkles
 } from 'lucide-react';
 
 export default function Header({ 
   viewMode, 
   setViewMode, 
   onOpenExport, 
-  onReset, 
   onQuickQR,
   onPublish,
-  profile,
   isUnlocked,
   onRequestUnlock
 }) {
   const [copied, setCopied] = React.useState(false);
+  const [activeNav, setActiveNav] = React.useState('dashboard');
 
   const handleShare = () => {
     if (navigator.clipboard) {
@@ -33,93 +35,109 @@ export default function Header({
     }
   };
 
+  const NAV_ITEMS = [
+    { id: 'qr-studio', label: 'QR Studio', icon: QrCode },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'my-links', label: 'My Links', icon: Link2 },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-800/80 bg-[#080914]/90 backdrop-blur-2xl">
+      <div className="max-w-[1600px] mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-3">
         
-        {/* Brand Logo */}
-        <div className="flex items-center space-x-2.5 min-w-0 flex-shrink-0">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/20 flex-shrink-0">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <QrCode className="w-5 h-5 text-indigo-400" />
+        {/* Brand Logo & Name */}
+        <div className="flex items-center space-x-3 flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 via-indigo-600 to-cyan-500 p-[1.5px] shadow-[0_0_20px_rgba(168,85,247,0.4)] flex-shrink-0">
+            <div className="w-full h-full bg-[#0a0c1b] rounded-[10.5px] flex items-center justify-center text-cyan-400">
+              <Network className="w-5 h-5 text-purple-400" />
             </div>
           </div>
-          <div className="min-w-0 truncate">
-            <span className="font-outfit font-extrabold text-sm sm:text-lg text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-indigo-400 block whitespace-nowrap truncate">
-              QR Linktree
-            </span>
-            <p className="text-[11px] text-slate-400 hidden md:block whitespace-nowrap truncate">
-              Digital Bio Card & QR Studio
-            </p>
+          <div className="min-w-0">
+            <div className="flex items-center space-x-1.5">
+              <span className="font-outfit font-extrabold text-sm sm:text-base text-white tracking-tight">
+                OpenSource
+              </span>
+              <span className="font-outfit font-extrabold text-sm sm:text-base text-purple-400 tracking-tight">
+                Linktree
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
-          
-          {/* Publish / Finish Button in Editor Mode */}
-          {viewMode === 'editor' && (
-            <button
-              onClick={onPublish}
-              className="flex items-center space-x-1.5 px-3 sm:px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-extrabold rounded-xl shadow-lg shadow-emerald-500/20 transition-all transform active:scale-95 border border-emerald-400/30 whitespace-nowrap"
-            >
-              <span>🚀 Publish</span>
-            </button>
-          )}
+        {/* Middle Navigation Tabs (Screenshot style) */}
+        <nav className="hidden md:flex items-center space-x-1 py-1 px-2 bg-[#0d0f22]/80 border border-slate-800/70 rounded-full">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeNav === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveNav(item.id);
+                  if (item.id === 'qr-studio') onQuickQR();
+                }}
+                className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-purple-600/40 to-indigo-600/40 text-purple-300 border border-purple-500/50 shadow-[0_0_12px_rgba(168,85,247,0.35)]'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-400' : 'text-slate-400'}`} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* Studio vs Card View Button */}
+        {/* Action Controls */}
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          
+          {/* Studio Toggle */}
           <button
             onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
-            className="flex items-center space-x-1.5 px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition-all transform active:scale-95 whitespace-nowrap"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#14162e] hover:bg-[#1a1e3d] border border-purple-500/40 text-purple-300 text-xs font-bold rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.2)] transition-all active:scale-95"
           >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>{viewMode === 'editor' ? 'View Card' : 'Studio Editor'}</span>
-          </button>
-
-          {/* Quick QR Button */}
-          <button
-            onClick={onQuickQR}
-            className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-indigo-300 text-xs font-medium rounded-xl transition-all whitespace-nowrap"
-            title="Scan or View QR Code"
-          >
-            <QrCode className="w-4 h-4 text-indigo-400" />
-            <span className="hidden md:inline">Show QR</span>
+            <Sliders className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline">{viewMode === 'editor' ? 'Card View' : 'Studio Editor'}</span>
           </button>
 
           {/* Share Button */}
           <button
             onClick={handleShare}
-            className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-medium rounded-xl transition-all border border-slate-800 whitespace-nowrap"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#0d0e21] hover:bg-slate-800/80 text-slate-300 text-xs font-medium rounded-xl border border-slate-800 transition-all"
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4 text-slate-400" />}
-            <span className="hidden md:inline">{copied ? "Copied!" : "Share"}</span>
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5 text-slate-400" />}
+            <span className="hidden lg:inline">{copied ? "Copied" : "Share"}</span>
           </button>
 
-          {/* Log In / Create Account Button */}
+          {/* Account Login Button */}
           <button
             onClick={onRequestUnlock}
-            className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-xs font-semibold transition-all border ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
               isUnlocked 
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20' 
-                : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20'
-            } whitespace-nowrap`}
-            title={isUnlocked ? "Account Logged In" : "Log In / Create Account"}
+                ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400' 
+                : 'bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20'
+            }`}
           >
-            {isUnlocked ? <Unlock className="w-3.5 h-3.5 text-emerald-400" /> : <Lock className="w-3.5 h-3.5 text-indigo-400" />}
-            <span className="hidden sm:inline">{isUnlocked ? "Account Active" : "Log In / Sign Up"}</span>
+            {isUnlocked ? <Unlock className="w-3.5 h-3.5 text-emerald-400" /> : <Lock className="w-3.5 h-3.5 text-purple-400" />}
+            <span className="hidden sm:inline">{isUnlocked ? "Account" : "Sign In"}</span>
           </button>
 
           {/* Export / Import Button */}
           <button
             onClick={onOpenExport}
-            className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all hidden sm:flex"
-            title="Export / Import Profile JSON"
+            className="p-1.5 bg-[#0d0e21] hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl transition-all hidden sm:flex"
+            title="Export JSON"
           >
-            <Download className="w-4 h-4 text-indigo-400" />
+            <Download className="w-4 h-4 text-purple-400" />
           </button>
+
         </div>
 
       </div>
     </header>
   );
 }
+

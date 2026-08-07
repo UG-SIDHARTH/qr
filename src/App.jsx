@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import SidebarNav from './components/SidebarNav';
+import DigitalBioCardBuilder from './components/Editor/DigitalBioCardBuilder';
+import DashboardQRCard from './components/Editor/DashboardQRCard';
 import ProfileTab from './components/Editor/ProfileTab';
 import SocialsTab from './components/Editor/SocialsTab';
 import PortfolioTab from './components/Editor/PortfolioTab';
@@ -40,7 +43,6 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
   if (!cleanHash) return { view: 'preview' };
 
-  // 2. Check system routes
   if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
     return { view: 'bulk' };
   }
@@ -48,7 +50,6 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     return { view: 'editor' };
   }
 
-  // 3. Check active single profile match
   if (activeProfile?.profile) {
     const p = activeProfile.profile;
     if (
@@ -59,14 +60,12 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
     }
   }
 
-  // 4. Check user= ID lookup
   if (cleanHash.startsWith('user=')) {
     const userId = cleanHash.replace('user=', '').trim();
     const found = members.find(m => String(m.id) === userId || String(m.id) === `user_${userId}`);
     if (found) return { view: 'preview', member: found };
   }
 
-  // 5. Search directory members
   const foundMember = members.find(m => 
     m.profile?.username?.toLowerCase() === cleanHash.toLowerCase() ||
     m.profile?.name?.toLowerCase().replace(/\s+/g, '_') === cleanHash.toLowerCase() ||
@@ -74,12 +73,10 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   );
   if (foundMember) return { view: 'preview', member: foundMember };
 
-  // 6. Mobile fallback for custom profile hash (e.g. #ug)
   if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
     return { view: 'preview', member: activeProfile };
   }
 
-  // 7. Generic mobile fallback card (NEVER show homepage on mobile hashtag scans!)
   return { 
     view: 'preview', 
     member: {
@@ -96,10 +93,10 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
       socials: [],
       portfolio: [],
       theme: {
-        id: 'midnight-glass',
-        name: 'Midnight Glass',
-        bgStyle: 'bg-preset-midnight',
-        accentColor: '#6366f1',
+        id: 'neon-purple-cyan',
+        name: 'Neon Purple/Cyan',
+        bgStyle: 'bg-preset-cyber',
+        accentColor: '#a855f7',
         buttonRadius: 'rounded-2xl',
         buttonGlow: true
       }
@@ -108,8 +105,6 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
 };
 
 export default function App() {
-  // Members directory list loaded from localStorage or default 100 members
-  // Members directory list loaded from localStorage or empty array
   const [membersList, setMembersList] = useState(() => {
     try {
       const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
@@ -121,7 +116,6 @@ export default function App() {
     return [];
   });
 
-  // Current active profile data loaded from URL hash member, localStorage, or EMPTY_PROFILE
   const [profileData, setProfileData] = useState(() => {
     let savedProfile = EMPTY_PROFILE;
     try {
@@ -149,7 +143,7 @@ export default function App() {
   const checkHashUrl = () => resolveHashUrl(window.location.hash, membersList, profileData);
 
   const initialUrlState = checkHashUrl();
-  const [viewMode, setViewMode] = useState(initialUrlState.view || 'preview');
+  const [viewMode, setViewMode] = useState(initialUrlState.view || 'editor');
   const [activeTab, setActiveTab] = useState('profile');
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [authRole, setAuthRole] = useState('none');
@@ -158,7 +152,6 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
 
-  // Sync state with URL hash on mount and hashchange
   useEffect(() => {
     const handleHashChange = () => {
       const state = checkHashUrl();
@@ -179,66 +172,16 @@ export default function App() {
     };
 
     handleHashChange();
-
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [membersList, isUnlocked]);
 
-  // Save changes to localStorage & auto-sync user profiles to Super Admin directory
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
     } catch (e) {}
-
-    const name = profileData.profile?.name?.trim();
-    const username = profileData.profile?.username?.trim().toLowerCase().replace(/^#/, '');
-
-    if (name || username) {
-      setMembersList(prev => {
-        const id = profileData.id || username || name.toLowerCase().replace(/\s+/g, '_') || 'user_custom';
-
-        const existingIdx = prev.findIndex(m => 
-          String(m.id) === String(id) ||
-          (username && m.profile?.username?.toLowerCase() === username) ||
-          (name && m.profile?.name?.toLowerCase() === name.toLowerCase())
-        );
-
-        const updatedProfileRecord = {
-          ...profileData,
-          id: id,
-          employeeId: profileData.employeeId || `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-          department: profileData.department || 'User Created',
-          profile: {
-            ...profileData.profile,
-            name: name || username || 'User Profile',
-            username: username || name?.toLowerCase().replace(/\s+/g, '_') || id,
-          }
-        };
-
-        let newMembers;
-        if (existingIdx >= 0) {
-          newMembers = [...prev];
-          newMembers[existingIdx] = updatedProfileRecord;
-        } else {
-          newMembers = [updatedProfileRecord, ...prev];
-        }
-
-        try {
-          localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
-        } catch (e) {}
-
-        return newMembers;
-      });
-    }
   }, [profileData]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(membersList));
-    } catch (e) {}
-  }, [membersList]);
-
-  // Handlers for profile updates
   const handleUpdateProfile = (newProfile) => {
     setProfileData(prev => ({ ...prev, profile: newProfile }));
   };
@@ -271,9 +214,7 @@ export default function App() {
   const handleAuthSuccess = (role = 'admin', userMember = null) => {
     setAuthRole(role);
     setIsUnlocked(true);
-    if (userMember) {
-      setProfileData(userMember);
-    }
+    if (userMember) setProfileData(userMember);
     const targetMode = role === 'superadmin' ? 'bulk' : 'editor';
     setViewMode(targetMode);
     window.history.replaceState(null, '', `#${targetMode}`);
@@ -284,24 +225,7 @@ export default function App() {
     setProfileData(newUser);
   };
 
-  const handleSelectMemberToEdit = (member) => {
-    setProfileData(member);
-    setViewMode('editor');
-    window.history.replaceState(null, '', '#editor');
-  };
-
-  const handleViewMemberProfile = (member) => {
-    setProfileData(member);
-    setViewMode('preview');
-    window.history.replaceState(null, '', `#user=${member.id}`);
-  };
-
   const handlePublishProfile = () => {
-    if (!profileData.profile?.name && !profileData.profile?.username) {
-      alert("Please enter at least your Name or Username in your profile before publishing!");
-      return;
-    }
-
     const cleanName = profileData.profile?.name?.trim() || 'User';
     const cleanUser = (profileData.profile?.username || cleanName)
       .trim()
@@ -312,8 +236,6 @@ export default function App() {
     const publishedRecord = {
       ...profileData,
       id: profileData.id || cleanUser,
-      employeeId: profileData.employeeId || 'USER-CUSTOM',
-      department: profileData.department || 'User Created',
       profile: {
         ...profileData.profile,
         name: cleanName,
@@ -321,32 +243,7 @@ export default function App() {
       }
     };
 
-    // Update active profile state
     setProfileData(publishedRecord);
-
-    // Sync directly to Super Admin directory roster & localStorage
-    setMembersList(prev => {
-      const existingIdx = prev.findIndex(m => 
-        String(m.id) === String(publishedRecord.id) ||
-        (m.profile?.username?.toLowerCase() === cleanUser)
-      );
-
-      let newMembers;
-      if (existingIdx >= 0) {
-        newMembers = [...prev];
-        newMembers[existingIdx] = publishedRecord;
-      } else {
-        newMembers = [publishedRecord, ...prev];
-      }
-
-      try {
-        localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
-      } catch (e) {}
-
-      return newMembers;
-    });
-
-    // Set URL hash to #<username>
     window.history.replaceState(null, '', `#${cleanUser}`);
     setIsPublishModalOpen(true);
   };
@@ -360,7 +257,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-cyber-dark flex flex-col font-sans selection:bg-purple-500 selection:text-white text-slate-100">
       
       {/* Navigation Header */}
       <Header
@@ -375,140 +272,163 @@ export default function App() {
         memberCount={membersList.length}
       />
 
-      {/* Main View Layout */}
-      {viewMode === 'preview' ? (
-        // Front Page Welcome Landing vs Public Linktree View
-        <main className="flex-1 w-full flex flex-col items-center justify-center relative">
-          {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (
-            <BioPage 
-              profileData={profileData} 
-              onOpenQR={() => setIsQRModalOpen(true)} 
-              isFullView={true} 
-            />
-          ) : (
-            <WelcomeLanding
-              onCreateLinktree={() => handleSetViewMode('editor')}
-              onOpenQR={() => setIsQRModalOpen(true)}
-            />
-          )}
-        </main>
-      ) : (
-        // Studio & Editor Mode (Split Pane)
-        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Column: Editor Dashboard */}
-          <div className="lg:col-span-7 bg-slate-900/50 border border-slate-800 rounded-3xl p-4 sm:p-6 backdrop-blur-xl shadow-xl space-y-6">
-            
-            {/* Header controls for tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
-              <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0 py-0.5">
-                {TABS.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0 ${
-                        isActive
-                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
-                      {tab.count !== undefined && (
-                        <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold ${
-                          isActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'
-                        }`}>
-                          {tab.count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+      <div className="flex-1 flex w-full">
+        
+        {/* Left Vertical Icon Sidebar */}
+        <SidebarNav 
+          onSelectView={handleSetViewMode}
+          onRequestUnlock={() => setIsAuthModalOpen(true)}
+          isUnlocked={isUnlocked}
+        />
 
-              {/* Action Buttons: Publish & Delete */}
-              <div className="flex items-center justify-end space-x-2 flex-shrink-0 border-t sm:border-t-0 sm:border-l border-slate-800 pt-2 sm:pt-0 sm:pl-3">
-                <button
-                  onClick={handlePublishProfile}
-                  className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white border border-emerald-400/30 rounded-xl text-xs font-extrabold flex items-center space-x-1.5 shadow-md shadow-emerald-500/20 transition-all active:scale-95 whitespace-nowrap"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Finish & Publish</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Active Tab Panel */}
-            <div className="min-h-[480px]">
-              {activeTab === 'profile' && (
-                <ProfileTab 
-                  profile={profileData?.profile || {}} 
-                  onChange={handleUpdateProfile} 
-                />
-              )}
-
-              {activeTab === 'socials' && (
-                <SocialsTab 
-                  socials={profileData?.socials || []} 
-                  onChange={handleUpdateSocials} 
-                />
-              )}
-
-              {activeTab === 'portfolio' && (
-                <PortfolioTab 
-                  portfolio={profileData?.portfolio || []} 
-                  onChange={handleUpdatePortfolio} 
-                />
-              )}
-
-              {activeTab === 'theme' && (
-                <ThemeTab 
-                  theme={profileData?.theme || {}} 
-                  onChange={handleUpdateTheme} 
-                />
-              )}
-
-              {activeTab === 'qr' && (
-                <QRCodeTab 
-                  qrConfig={profileData?.qrConfig || {}} 
-                  profile={profileData?.profile || {}}
-                  socials={profileData?.socials || []}
-                  onChange={handleUpdateQR} 
-                />
-              )}
-            </div>
-
-          </div>
-
-          {/* Right Live Phone Simulator */}
-          <div className="hidden lg:flex flex-col items-center lg:col-span-5 w-full">
-            <div className="sticky top-20 w-full flex flex-col items-center">
-              <div className="w-full max-w-[370px] mb-2 flex items-center justify-between px-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
-                  Live Mobile Simulator
-                </span>
-                <button
-                  onClick={() => setViewMode('preview')}
-                  className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  Full Page View
-                </button>
-              </div>
-
-              <PhoneMockup 
+        {/* Main View Layout */}
+        {viewMode === 'preview' ? (
+          // Public Linktree View
+          <main className="flex-1 w-full flex flex-col items-center justify-center relative">
+            {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (
+              <BioPage 
                 profileData={profileData} 
                 onOpenQR={() => setIsQRModalOpen(true)} 
+                isFullView={true} 
               />
-            </div>
-          </div>
+            ) : (
+              <WelcomeLanding
+                onCreateLinktree={() => handleSetViewMode('editor')}
+                onOpenQR={() => setIsQRModalOpen(true)}
+              />
+            )}
+          </main>
+        ) : viewMode === 'bulk' ? (
+          // Super Admin Roster View
+          <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+            <BulkAdminDashboard
+              membersList={membersList}
+              onSelectMemberToEdit={(member) => {
+                setProfileData(member);
+                setViewMode('editor');
+              }}
+              onViewMemberProfile={(member) => {
+                setProfileData(member);
+                setViewMode('preview');
+              }}
+              onDeleteMember={(id) => {
+                setMembersList(prev => prev.filter(m => m.id !== id));
+              }}
+            />
+          </main>
+        ) : (
+          // Main Dashboard Editor Mode (Exact 2-Card Layout from Reference Screenshot)
+          <main className="flex-1 max-w-[1600px] w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+            
+            {/* Top 2-Card Grid (Screenshot Style: Left Card "Digital Bio Card Builder", Right Card "High-Res QR Code Generator") */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+              
+              {/* Left Card: Digital Bio Card Builder */}
+              <DigitalBioCardBuilder
+                profileData={profileData}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                onOpenLivePreview={() => setViewMode('preview')}
+                onOpenQR={() => setIsQRModalOpen(true)}
+              />
 
-        </main>
-      )}
+              {/* Right Card: High-Res QR Code Generator */}
+              <DashboardQRCard
+                profileData={profileData}
+                onUpdateQR={handleUpdateQR}
+              />
+
+            </div>
+
+            {/* Bottom Detailed Editor Panel */}
+            <div className="w-full bg-[#0c0d20]/95 border border-slate-800/90 rounded-[28px] p-5 sm:p-7 backdrop-blur-2xl shadow-2xl space-y-6">
+              
+              {/* Tab Header Selector */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800/80 pb-4 gap-3">
+                <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar flex-1 py-0.5">
+                  {TABS.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`flex items-center space-x-2 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
+                          isActive
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] border border-purple-400/40'
+                            : 'text-slate-400 hover:text-slate-200 hover:bg-[#13152c]'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-300' : 'text-slate-400'}`} />
+                        <span>{tab.label}</span>
+                        {tab.count !== undefined && (
+                          <span className={`px-1.5 py-0.5 text-[10px] rounded-full font-bold ${
+                            isActive ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            {tab.count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Publish Action Button */}
+                <button
+                  onClick={handlePublishProfile}
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white rounded-2xl text-xs font-extrabold flex items-center space-x-1.5 shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all active:scale-95 whitespace-nowrap self-end sm:self-auto"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
+                  <span>Publish Profile</span>
+                </button>
+              </div>
+
+              {/* Tab Form Content */}
+              <div className="min-h-[360px] pt-2">
+                {activeTab === 'profile' && (
+                  <ProfileTab 
+                    profile={profileData?.profile || {}} 
+                    onChange={handleUpdateProfile} 
+                  />
+                )}
+
+                {activeTab === 'socials' && (
+                  <SocialsTab 
+                    socials={profileData?.socials || []} 
+                    onChange={handleUpdateSocials} 
+                  />
+                )}
+
+                {activeTab === 'portfolio' && (
+                  <PortfolioTab 
+                    portfolio={profileData?.portfolio || []} 
+                    onChange={handleUpdatePortfolio} 
+                  />
+                )}
+
+                {activeTab === 'theme' && (
+                  <ThemeTab 
+                    theme={profileData?.theme || {}} 
+                    onChange={handleUpdateTheme} 
+                  />
+                )}
+
+                {activeTab === 'qr' && (
+                  <QRCodeTab 
+                    qrConfig={profileData?.qrConfig || {}} 
+                    profile={profileData?.profile || {}}
+                    socials={profileData?.socials || []}
+                    onChange={handleUpdateQR} 
+                  />
+                )}
+              </div>
+
+            </div>
+
+          </main>
+        )}
+
+      </div>
 
       {/* Modals */}
       <AdminAuthModal 
@@ -541,10 +461,11 @@ export default function App() {
       />
 
       {/* Global Copyright Footer */}
-      <footer className="w-full py-3.5 border-t border-slate-900 bg-slate-950/95 text-center text-xs text-slate-400 font-medium">
-        <span>© {new Date().getFullYear()} <strong className="text-indigo-300 font-bold">UG_SIDHARTH</strong>. All rights reserved.</span>
+      <footer className="w-full py-4 border-t border-slate-800/80 bg-[#070815]/95 text-center text-xs text-slate-400 font-medium z-40">
+        <span>© {new Date().getFullYear()} <strong className="text-purple-300 font-bold">UG_SIDHARTH</strong>. OpenSource Linktree Studio.</span>
       </footer>
 
     </div>
   );
 }
+
