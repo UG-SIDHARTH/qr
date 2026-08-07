@@ -80,15 +80,37 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   );
   if (foundMember) return { view: 'preview', member: foundMember };
 
-  // 6. Mobile fallback for custom profile hash (e.g. #ug)
-  if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
-    return { view: 'preview', member: activeProfile };
-  }
-
-  // 7. Generic mobile fallback card (NEVER show homepage on mobile hashtag scans!)
+  // 6. Generic mobile fallback card for custom user hash (e.g. #alex_dev)
+  const cleanName = cleanHash.replace(/_/g, ' ');
   return { 
     view: 'preview', 
-    member: DEFAULT_PROFILE
+    member: {
+      id: cleanHash,
+      employeeId: 'USER-CUSTOM',
+      department: 'User Profile',
+      profile: {
+        name: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
+        username: cleanHash,
+        title: 'Digital Creator',
+        avatar: '',
+        bio: '',
+        location: '',
+        email: '',
+        phone: '',
+        verified: false,
+        statusText: ''
+      },
+      socials: [],
+      portfolio: [],
+      theme: {
+        id: 'midnight-glass',
+        name: 'Midnight Glass',
+        bgStyle: 'bg-preset-midnight',
+        accentColor: '#6366f1',
+        buttonRadius: 'rounded-2xl',
+        buttonGlow: true
+      }
+    }
   };
 };
 
@@ -358,8 +380,10 @@ export default function App() {
       return newMembers;
     });
 
-    // Set URL hash to #<username>
-    window.history.replaceState(null, '', `#${cleanUser}`);
+    // Set URL hash to #<username>?p=<encodedPayload>
+    const encodedPayload = encodeProfileData(publishedRecord);
+    const publishedHash = getProfileHash(publishedRecord) + (encodedPayload ? `?${encodedPayload}` : '');
+    window.history.replaceState(null, '', publishedHash);
     setIsPublishModalOpen(true);
   };
 
