@@ -114,7 +114,14 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed?.profile?.name && parsed?.socials && parsed.socials.length > 0) {
-          savedProfile = parsed;
+          savedProfile = {
+            ...parsed,
+            profile: {
+              ...DEFAULT_PROFILE.profile,
+              ...parsed.profile,
+              avatar: parsed.profile.avatar || DEFAULT_PROFILE.profile.avatar
+            }
+          };
         }
       }
     } catch (e) {}
