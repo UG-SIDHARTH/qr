@@ -189,11 +189,52 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [isUnlocked]);
 
-  // Save profileData changes to localStorage
+  // Automatically save profileData changes to localStorage & sync directory roster
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
     } catch (e) {}
+
+    const name = profileData.profile?.name?.trim();
+    const username = profileData.profile?.username?.trim().toLowerCase().replace(/^#/, '');
+
+    if (name || username) {
+      setMembersList(prev => {
+        const id = profileData.id || username || name.toLowerCase().replace(/\s+/g, '_') || 'user_custom';
+
+        const existingIdx = prev.findIndex(m => 
+          String(m.id) === String(id) ||
+          (username && m.profile?.username?.toLowerCase() === username) ||
+          (name && m.profile?.name?.toLowerCase() === name.toLowerCase())
+        );
+
+        const updatedRecord = {
+          ...profileData,
+          id: id,
+          profile: {
+            ...profileData.profile,
+            name: name || username || 'User Profile',
+            username: username || name?.toLowerCase().replace(/\s+/g, '_') || id,
+          }
+        };
+
+        if (existingIdx >= 0) {
+          if (JSON.stringify(prev[existingIdx]) === JSON.stringify(updatedRecord)) return prev;
+          const newMembers = [...prev];
+          newMembers[existingIdx] = updatedRecord;
+          try {
+            localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
+          } catch (e) {}
+          return newMembers;
+        } else {
+          const newMembers = [updatedRecord, ...prev];
+          try {
+            localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
+          } catch (e) {}
+          return newMembers;
+        }
+      });
+    }
   }, [profileData]);
 
   useEffect(() => {
