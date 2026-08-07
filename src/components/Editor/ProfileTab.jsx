@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   User, 
   AtSign, 
@@ -11,10 +11,13 @@ import {
   Image, 
   Sparkles,
   Upload,
-  Lock
+  Lock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export default function ProfileTab({ profile = {}, onChange }) {
+  const [showPassword, setShowPassword] = useState(false);
   const p = profile || {};
   const handleChange = (field, value) => {
     onChange({
@@ -220,12 +223,19 @@ export default function ProfileTab({ profile = {}, onChange }) {
           <div className="relative">
             <Lock className="w-4 h-4 text-indigo-400 absolute left-3 top-2.5" />
             <input
-              type="text"
-              value={p.adminPin || '1234'}
+              type={showPassword ? "text" : "password"}
+              value={p.adminPin || ''}
               onChange={(e) => handleChange('adminPin', e.target.value)}
               placeholder="Account password..."
-              className="w-full pl-9 pr-3 py-2 glass-input rounded-xl text-sm font-mono"
+              className="w-full pl-9 pr-10 py-2 glass-input rounded-xl text-sm font-mono"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 text-slate-400 hover:text-white"
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
           </div>
         </div>
 

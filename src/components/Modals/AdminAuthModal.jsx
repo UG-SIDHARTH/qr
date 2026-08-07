@@ -293,11 +293,10 @@ export default function AdminAuthModal({
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="mb-1">
                 <label className="block text-xs font-medium text-slate-300">
                   Password
                 </label>
-                <span className="text-[10px] text-slate-500">Default PIN: 123456</span>
               </div>
               <div className="relative">
                 <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
