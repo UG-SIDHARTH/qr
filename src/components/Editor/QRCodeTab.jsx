@@ -33,7 +33,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
       const vcard = generateVCard(profile, socials);
       if (vcard) return vcard;
     }
-    const url = getProfileUrl(profile);
+    const url = getProfileUrl({ profile, socials, qrConfig });
     return url || `${window.location.origin}${window.location.pathname}#profile`;
   };
 

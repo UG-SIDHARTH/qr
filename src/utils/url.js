@@ -50,24 +50,27 @@ const base64ToUtf8 = (base64Str) => {
   }
 };
 
-// Encode profile payload into URL parameter so any device scanning QR receives full profile data
 export const encodeProfileData = (profileData = {}) => {
   try {
-    if (!profileData || (!profileData.profile && !profileData.socials)) return null;
+    if (!profileData) return null;
+    const pObj = profileData.profile || (profileData.name || profileData.username ? profileData : null);
+    if (!pObj && (!profileData.socials || profileData.socials.length === 0)) return null;
+
+    const p = pObj || {};
 
     const compact = {
-      id: profileData.id,
+      id: profileData.id || p.username || 'user',
       p: {
-        n: profileData.profile?.name || '',
-        u: profileData.profile?.username || '',
-        t: profileData.profile?.title || '',
-        a: profileData.profile?.avatar || '',
-        b: profileData.profile?.bio || '',
-        s: profileData.profile?.statusText || '',
-        l: profileData.profile?.location || '',
-        e: profileData.profile?.email || '',
-        ph: profileData.profile?.phone || '',
-        v: profileData.profile?.verified || false,
+        n: p.name || '',
+        u: p.username || '',
+        t: p.title || '',
+        a: p.avatar || '',
+        b: p.bio || '',
+        s: p.statusText || '',
+        l: p.location || '',
+        e: p.email || '',
+        ph: p.phone || '',
+        v: p.verified || false,
       },
       s: (profileData.socials || []).filter(s => s && s.enabled).map(s => ({
         i: s.id,
@@ -78,15 +81,15 @@ export const encodeProfileData = (profileData = {}) => {
         c: s.color,
         b: s.badge
       })),
-      pf: (profileData.portfolio || []).map(p => ({
-        i: p.id,
-        t: p.title,
-        d: p.description,
-        u: p.url,
-        im: p.image,
-        tg: p.tags,
-        f: p.featured,
-        st: p.stars
+      pf: (profileData.portfolio || []).map(pItem => ({
+        i: pItem.id,
+        t: pItem.title,
+        d: pItem.description,
+        u: pItem.url,
+        im: pItem.image,
+        tg: pItem.tags,
+        f: pItem.featured,
+        st: pItem.stars
       })),
       th: profileData.theme
     };
