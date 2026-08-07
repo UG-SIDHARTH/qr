@@ -52,18 +52,18 @@ export default function SocialsTab({ socials = [], onChange }) {
 
   const handleUpdate = (id, field, value) => {
     onChange(
-      socials.map((s) => (s.id === id ? { ...s, [field]: value } : s))
+      safeSocials.map((s) => (s && s.id === id ? { ...s, [field]: value } : s))
     );
   };
 
   const handleRemove = (id) => {
-    onChange(socials.filter((s) => s.id !== id));
+    onChange(safeSocials.filter((s) => s && s.id !== id));
   };
 
   const handleMove = (index, direction) => {
     const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= socials.length) return;
-    const newSocials = [...socials];
+    if (targetIndex < 0 || targetIndex >= safeSocials.length) return;
+    const newSocials = [...safeSocials];
     const [moved] = newSocials.splice(index, 1);
     newSocials.splice(targetIndex, 0, moved);
     onChange(newSocials);
@@ -107,7 +107,7 @@ export default function SocialsTab({ socials = [], onChange }) {
 
       {/* Social Links Manager List */}
       <div className="space-y-3">
-        {socials.map((social, index) => (
+        {safeSocials.map((social, index) => (
           <div
             key={social.id}
             className={`p-3.5 rounded-2xl border transition-all ${

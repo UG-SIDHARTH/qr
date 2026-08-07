@@ -13,8 +13,8 @@ import ExportModal from './components/Modals/ExportModal';
 import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
-import { EMPTY_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl } from './utils/url';
+import { DEFAULT_PROFILE } from './data/defaultProfile';
+import { getProfileHash, getProfileUrl, decodeProfileData } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -36,6 +36,12 @@ const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 // Helper to resolve route and member from URL hash
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   if (!hash) return { view: 'preview' };
+
+  // 1. First priority: Check if URL hash contains an encoded full profile payload (?p=...)
+  const decodedMember = decodeProfileData(hash);
+  if (decodedMember && (decodedMember.profile?.name || decodedMember.profile?.username)) {
+    return { view: 'preview', member: decodedMember };
+  }
 
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
   if (!cleanHash) return { view: 'preview' };
@@ -82,28 +88,7 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   // 7. Generic mobile fallback card (NEVER show homepage on mobile hashtag scans!)
   return { 
     view: 'preview', 
-    member: {
-      id: cleanHash,
-      profile: {
-        name: cleanHash.replace(/_/g, ' '),
-        username: cleanHash,
-        title: '',
-        avatar: '',
-        bio: '',
-        verified: false,
-        statusText: ''
-      },
-      socials: [],
-      portfolio: [],
-      theme: {
-        id: 'midnight-glass',
-        name: 'Midnight Glass',
-        bgStyle: 'bg-preset-midnight',
-        accentColor: '#6366f1',
-        buttonRadius: 'rounded-2xl',
-        buttonGlow: true
-      }
-    }
+    member: DEFAULT_PROFILE
   };
 };
 
@@ -115,18 +100,21 @@ export default function App() {
       const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {}
-    return [];
+    return [DEFAULT_PROFILE];
   });
 
-  // Current active profile data loaded from URL hash member, localStorage, or EMPTY_PROFILE
+  // Current active profile data loaded from URL hash member, localStorage, or DEFAULT_PROFILE
   const [profileData, setProfileData] = useState(() => {
-    let savedProfile = EMPTY_PROFILE;
+    let savedProfile = DEFAULT_PROFILE;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) savedProfile = JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.profile?.name || parsed?.profile?.username) savedProfile = parsed;
+      }
     } catch (e) {}
 
     const initialMembers = (() => {
@@ -161,10 +149,27 @@ export default function App() {
   // Sync state with URL hash on mount and hashchange
   useEffect(() => {
     const handleHashChange = () => {
-      const state = checkHashUrl();
+      const state = resolveHashUrl(window.location.hash, membersList, profileData);
       if (state.member) {
         setProfileData(state.member);
         setViewMode('preview');
+
+        if (state.member.profile?.name || state.member.profile?.username) {
+          setMembersList(prev => {
+            const exists = prev.some(m => 
+              String(m.id) === String(state.member.id) ||
+              (m.profile?.username && m.profile.username.toLowerCase() === state.member.profile?.username?.toLowerCase())
+            );
+            if (!exists) {
+              const updated = [state.member, ...prev];
+              try {
+                localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(updated));
+              } catch (e) {}
+              return updated;
+            }
+            return prev;
+          });
+        }
       } else if (state.view === 'bulk') {
         if (!isUnlocked) {
           setIsAuthModalOpen(true);
@@ -173,8 +178,6 @@ export default function App() {
         }
       } else if (state.view === 'editor') {
         setViewMode('editor');
-      } else {
-        setViewMode('preview');
       }
     };
 
@@ -182,54 +185,13 @@ export default function App() {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [membersList, isUnlocked]);
+  }, [isUnlocked]);
 
-  // Save changes to localStorage & auto-sync user profiles to Super Admin directory
+  // Save profileData changes to localStorage
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
     } catch (e) {}
-
-    const name = profileData.profile?.name?.trim();
-    const username = profileData.profile?.username?.trim().toLowerCase().replace(/^#/, '');
-
-    if (name || username) {
-      setMembersList(prev => {
-        const id = profileData.id || username || name.toLowerCase().replace(/\s+/g, '_') || 'user_custom';
-
-        const existingIdx = prev.findIndex(m => 
-          String(m.id) === String(id) ||
-          (username && m.profile?.username?.toLowerCase() === username) ||
-          (name && m.profile?.name?.toLowerCase() === name.toLowerCase())
-        );
-
-        const updatedProfileRecord = {
-          ...profileData,
-          id: id,
-          employeeId: profileData.employeeId || `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-          department: profileData.department || 'User Created',
-          profile: {
-            ...profileData.profile,
-            name: name || username || 'User Profile',
-            username: username || name?.toLowerCase().replace(/\s+/g, '_') || id,
-          }
-        };
-
-        let newMembers;
-        if (existingIdx >= 0) {
-          newMembers = [...prev];
-          newMembers[existingIdx] = updatedProfileRecord;
-        } else {
-          newMembers = [updatedProfileRecord, ...prev];
-        }
-
-        try {
-          localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
-        } catch (e) {}
-
-        return newMembers;
-      });
-    }
   }, [profileData]);
 
   useEffect(() => {

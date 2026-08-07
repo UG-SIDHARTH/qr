@@ -1,18 +1,52 @@
-export const EMPTY_PROFILE = {
+export const DEFAULT_PROFILE = {
+  id: "ug_sidharth",
+  employeeId: "UG-001",
+  department: "Media & Development",
   profile: {
-    name: "",
-    username: "",
-    title: "",
+    name: "SIDHARTH D",
+    username: "ug_sidharth",
+    title: "MEDIA",
     avatar: "",
-    bio: "",
-    location: "",
+    bio: "Welcome to my official digital bio card. Connect via GitHub, Instagram, or website.",
+    location: "India",
     email: "",
     phone: "",
-    verified: false,
-    statusText: "",
+    verified: true,
+    statusText: "🚀 Digital Creator & Developer",
     adminPin: import.meta.env.VITE_ADMIN_PASSCODE || "123456",
   },
-  socials: [],
+  socials: [
+    {
+      id: "s1",
+      platform: "github",
+      title: "GitHub",
+      subtitle: "Open Source Repositories",
+      url: "https://github.com/UG-SIDHARTH",
+      icon: "Github",
+      color: "#333333",
+      enabled: true
+    },
+    {
+      id: "s2",
+      platform: "instagram",
+      title: "Instagram",
+      subtitle: "Photos & Stories",
+      url: "https://instagram.com/ug_sidharth",
+      icon: "Instagram",
+      color: "#e1306c",
+      enabled: true
+    },
+    {
+      id: "s3",
+      platform: "website",
+      title: "Website",
+      subtitle: "Personal Website",
+      url: "https://ugsidharth.in",
+      icon: "Globe",
+      color: "#4f46e5",
+      enabled: true
+    }
+  ],
   portfolio: [],
   theme: {
     id: "midnight-glass",
@@ -20,7 +54,7 @@ export const EMPTY_PROFILE = {
     bgStyle: "bg-preset-midnight",
     cardStyle: "glass-card",
     accentColor: "#6366f1",
-    buttonRadius: "rounded-xl",
+    buttonRadius: "rounded-2xl",
     fontFamily: "font-sans",
     buttonGlow: true,
   },
@@ -30,15 +64,13 @@ export const EMPTY_PROFILE = {
     bgColor: "#090d16",
     dotStyle: "rounded",
     cornerStyle: "rounded",
-    frameText: "SCAN TO VIEW BIO",
+    frameText: "SCAN FOR SIDHARTH'S BIO",
     frameColor: "#6366f1",
     logoText: "⚡",
     includeLogo: true,
     errorCorrectionLevel: "H",
   }
 };
-
-export const DEFAULT_PROFILE = EMPTY_PROFILE;
 
 export const THEME_PRESETS = [
   {

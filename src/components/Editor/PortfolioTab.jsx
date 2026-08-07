@@ -68,7 +68,7 @@ export default function PortfolioTab({ portfolio = [], onChange }) {
       </div>
 
       <div className="space-y-4">
-        {portfolio.map((project) => (
+        {safePortfolio.map((project) => (
           <div
             key={project.id}
             className={`p-4 rounded-2xl border transition-all ${
