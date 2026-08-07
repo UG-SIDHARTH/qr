@@ -17,6 +17,39 @@ export const getProfileHash = (profileData = {}) => {
   return '#profile';
 };
 
+// Safe UTF-8 to URL-safe Base64 encoding using Uint8Array & TextEncoder
+const utf8ToBase64 = (str) => {
+  try {
+    const bytes = new TextEncoder().encode(str);
+    let binString = "";
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binString += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binString)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  } catch (e) {
+    return "";
+  }
+};
+
+// Safe URL-safe Base64 to UTF-8 decoding using Uint8Array & TextDecoder
+const base64ToUtf8 = (base64Str) => {
+  try {
+    let b64 = base64Str.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const binString = atob(b64);
+    const bytes = new Uint8Array(binString.length);
+    for (let i = 0; i < binString.length; i++) {
+      bytes[i] = binString.charCodeAt(i);
+    }
+    return new TextDecoder().decode(bytes);
+  } catch (e) {
+    return "";
+  }
+};
+
 // Encode profile payload into URL parameter so any device scanning QR receives full profile data
 export const encodeProfileData = (profileData = {}) => {
   try {
@@ -59,10 +92,8 @@ export const encodeProfileData = (profileData = {}) => {
     };
 
     const jsonStr = JSON.stringify(compact);
-    const base64 = btoa(unescape(encodeURIComponent(jsonStr)))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+    const base64 = utf8ToBase64(jsonStr);
+    if (!base64) return null;
     return `p=${base64}`;
   } catch (e) {
     console.error("Failed to encode profile for URL:", e);
@@ -78,10 +109,8 @@ export const decodeProfileData = (hashStr = '') => {
     const match = clean.match(/(?:^|[?&])p=([^&]+)/);
     if (!match || !match[1]) return null;
 
-    let b64 = match[1].replace(/-/g, '+').replace(/_/g, '/');
-    while (b64.length % 4) b64 += '=';
-
-    const jsonStr = decodeURIComponent(escape(atob(b64)));
+    const jsonStr = base64ToUtf8(match[1]);
+    if (!jsonStr) return null;
     const compact = JSON.parse(jsonStr);
 
     if (!compact || (!compact.p?.n && !compact.p?.u)) return null;
