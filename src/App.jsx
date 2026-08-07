@@ -113,7 +113,9 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed?.profile?.name || parsed?.profile?.username) savedProfile = parsed;
+        if (parsed?.profile?.name && parsed?.socials && parsed.socials.length > 0) {
+          savedProfile = parsed;
+        }
       }
     } catch (e) {}
 
