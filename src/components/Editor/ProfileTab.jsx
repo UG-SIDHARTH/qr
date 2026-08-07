@@ -34,7 +34,7 @@ export default function ProfileTab({ profile = {}, onChange }) {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxDim = 96;
+          const maxDim = 64;
           let width = img.width;
           let height = img.height;
 
@@ -51,7 +51,7 @@ export default function ProfileTab({ profile = {}, onChange }) {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          const compressed = canvas.toDataURL('image/jpeg', 0.5);
           handleChange('avatar', compressed);
         };
         img.src = reader.result;
