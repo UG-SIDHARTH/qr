@@ -54,7 +54,7 @@ export default function BioPage({ profileData = {}, onOpenQR, isFullView = false
   const activeSocials = (socials || []).filter(s => s && s.enabled);
   const isEmptyProfile = !profile?.name && !profile?.username && activeSocials.length === 0 && (!portfolio || portfolio.length === 0);
 
-  const displayAvatar = profile?.avatar || null;
+  const displayAvatar = profile?.avatar || (profile?.username ? `https://github.com/${profile.username.trim().replace(/^#/, '')}.png` : null);
   const displayName = profile?.name || (isEmptyProfile ? "Your Name" : "");
   const displayUsername = profile?.username || (isEmptyProfile ? "your_username" : "");
   const displayTitle = profile?.title || (isEmptyProfile ? "Digital Creator & Developer" : "");

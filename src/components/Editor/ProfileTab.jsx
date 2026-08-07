@@ -31,7 +31,30 @@ export default function ProfileTab({ profile = {}, onChange }) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        handleChange('avatar', reader.result);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 96;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          handleChange('avatar', compressed);
+        };
+        img.src = reader.result;
       };
       reader.readAsDataURL(file);
     }
