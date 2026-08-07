@@ -38,16 +38,22 @@ const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 
 // Helper to resolve route and member from URL hash
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
-  if (!hash) return { view: 'preview' };
+  if (!hash) return { view: 'welcome' };
 
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
-  if (!cleanHash) return { view: 'preview' };
+  if (!cleanHash || cleanHash === 'welcome' || cleanHash === 'home' || cleanHash === 'landing') {
+    return { view: 'welcome' };
+  }
 
   if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
     return { view: 'bulk' };
   }
   if (cleanHash === 'editor' || cleanHash === 'studio') {
     return { view: 'editor' };
+  }
+
+  if (cleanHash === 'preview' || cleanHash === 'card') {
+    return { view: 'preview', member: activeProfile };
   }
 
   if (activeProfile?.profile) {
@@ -73,35 +79,7 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   );
   if (foundMember) return { view: 'preview', member: foundMember };
 
-  if (activeProfile && (activeProfile.profile?.name || activeProfile.profile?.username)) {
-    return { view: 'preview', member: activeProfile };
-  }
-
-  return { 
-    view: 'preview', 
-    member: {
-      id: cleanHash,
-      profile: {
-        name: cleanHash.replace(/_/g, ' '),
-        username: cleanHash,
-        title: '',
-        avatar: '',
-        bio: '',
-        verified: false,
-        statusText: ''
-      },
-      socials: [],
-      portfolio: [],
-      theme: {
-        id: 'neon-purple-cyan',
-        name: 'Neon Purple/Cyan',
-        bgStyle: 'bg-preset-cyber',
-        accentColor: '#a855f7',
-        buttonRadius: 'rounded-2xl',
-        buttonGlow: true
-      }
-    }
-  };
+  return { view: 'welcome' };
 };
 
 export default function App() {
@@ -143,7 +121,7 @@ export default function App() {
   const checkHashUrl = () => resolveHashUrl(window.location.hash, membersList, profileData);
 
   const initialUrlState = checkHashUrl();
-  const [viewMode, setViewMode] = useState(initialUrlState.view || 'editor');
+  const [viewMode, setViewMode] = useState(initialUrlState.view || 'welcome');
   const [activeTab, setActiveTab] = useState('profile');
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [authRole, setAuthRole] = useState('none');
@@ -157,17 +135,9 @@ export default function App() {
       const state = checkHashUrl();
       if (state.member) {
         setProfileData(state.member);
-        setViewMode('preview');
-      } else if (state.view === 'bulk') {
-        if (!isUnlocked) {
-          setIsAuthModalOpen(true);
-        } else {
-          setViewMode('bulk');
-        }
-      } else if (state.view === 'editor') {
-        setViewMode('editor');
+        setViewMode(state.view);
       } else {
-        setViewMode('preview');
+        setViewMode(state.view || 'welcome');
       }
     };
 
@@ -282,21 +252,22 @@ export default function App() {
         />
 
         {/* Main View Layout */}
-        {viewMode === 'preview' ? (
-          // Public Linktree View
+        {viewMode === 'welcome' ? (
+          // Antigravity Welcome Landing Page
           <main className="flex-1 w-full flex flex-col items-center justify-center relative">
-            {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (
-              <BioPage 
-                profileData={profileData} 
-                onOpenQR={() => setIsQRModalOpen(true)} 
-                isFullView={true} 
-              />
-            ) : (
-              <WelcomeLanding
-                onCreateLinktree={() => handleSetViewMode('editor')}
-                onOpenQR={() => setIsQRModalOpen(true)}
-              />
-            )}
+            <WelcomeLanding
+              onCreateLinktree={() => handleSetViewMode('editor')}
+              onOpenQR={() => setIsQRModalOpen(true)}
+            />
+          </main>
+        ) : viewMode === 'preview' ? (
+          // Public Bio Card View
+          <main className="flex-1 w-full flex flex-col items-center justify-center relative">
+            <BioPage 
+              profileData={profileData} 
+              onOpenQR={() => setIsQRModalOpen(true)} 
+              isFullView={true} 
+            />
           </main>
         ) : viewMode === 'bulk' ? (
           // Super Admin Roster View
@@ -317,6 +288,8 @@ export default function App() {
             />
           </main>
         ) : (
+          // Studio Editor Dashboard View
+
           // Main Dashboard Editor Mode (Exact 2-Card Layout from Reference Screenshot)
           <main className="flex-1 max-w-[1600px] w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
             
