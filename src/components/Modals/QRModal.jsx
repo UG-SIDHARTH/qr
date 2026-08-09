@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { X, Download, Copy, Check, QrCode, UserPlus } from 'lucide-react';
 import { downloadVCard, generateVCard } from '../../utils/vcard';
-import { getProfileUrl } from '../../utils/url';
+import { getProfileUrl, getShortProfileUrl } from '../../utils/url';
 
 export default function QRModal({ isOpen, onClose, profileData }) {
   const canvasRef = useRef(null);
@@ -10,8 +10,8 @@ export default function QRModal({ isOpen, onClose, profileData }) {
   const { profile, socials, qrConfig } = profileData;
 
   const encodedData = (qrConfig?.mode === 'vcard') 
-    ? (generateVCard(profile, socials) || getProfileUrl(profileData))
-    : getProfileUrl(profileData);
+    ? (generateVCard(profile, socials) || getShortProfileUrl(profileData))
+    : getShortProfileUrl(profileData);
 
   useEffect(() => {
     if (!isOpen || !canvasRef.current) return;
@@ -21,7 +21,7 @@ export default function QRModal({ isOpen, onClose, profileData }) {
         canvasRef.current,
         encodedData || `${window.location.origin}#profile`,
         {
-          width: 240,
+          width: 180,
           margin: 2,
           color: {
             dark: qrConfig?.fgColor || '#a855f7',
@@ -35,7 +35,7 @@ export default function QRModal({ isOpen, onClose, profileData }) {
             QRCode.toCanvas(
               canvasRef.current,
               encodedData || `${window.location.origin}#profile`,
-              { width: 240, margin: 2, errorCorrectionLevel: 'L' }
+              { width: 180, margin: 2, errorCorrectionLevel: 'L' }
             ).catch(() => {});
           }
         }
@@ -73,43 +73,43 @@ export default function QRModal({ isOpen, onClose, profileData }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-[310px] bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl space-y-3.5">
         
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all"
+          className="absolute top-3 right-3 p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-full transition-all"
         >
-          <X className="w-4 h-4" />
+          <X className="w-3.5 h-3.5" />
         </button>
 
         {/* Title */}
-        <div className="text-center space-y-1">
-          <div className="w-10 h-10 mx-auto rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-2">
-            <QrCode className="w-5 h-5" />
+        <div className="text-center space-y-0.5 pt-1">
+          <div className="w-8 h-8 mx-auto rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-1">
+            <QrCode className="w-4 h-4" />
           </div>
-          <h3 className="text-lg font-bold text-white font-outfit">
+          <h3 className="text-base font-bold text-white font-outfit">
             Scan QR Code
           </h3>
-          <p className="text-xs text-slate-400">
-            {qrConfig.mode === 'vcard' ? 'Scan with your phone to add contact' : 'Scan to open bio & portfolio page'}
+          <p className="text-[11px] text-slate-400">
+            {qrConfig.mode === 'vcard' ? 'Scan to add contact' : 'Scan to open bio page'}
           </p>
         </div>
 
         {/* Canvas Render Box */}
         <div 
-          className="p-4 rounded-2xl flex flex-col items-center justify-center border shadow-inner"
+          className="p-3 rounded-xl flex flex-col items-center justify-center border shadow-inner"
           style={{ 
             backgroundColor: qrConfig.bgColor || '#090d16',
             borderColor: qrConfig.fgColor + '30'
           }}
         >
-          <div className="relative p-2 bg-white/5 rounded-xl border border-white/10">
-            <canvas ref={canvasRef} className="rounded-lg" />
+          <div className="relative p-1.5 bg-white/5 rounded-lg border border-white/10">
+            <canvas ref={canvasRef} className="rounded-md" />
             {qrConfig.includeLogo && (
               <div 
-                className="absolute inset-0 m-auto w-9 h-9 rounded-xl bg-slate-950 border-2 flex items-center justify-center text-xs shadow-xl"
+                className="absolute inset-0 m-auto w-7 h-7 rounded-lg bg-slate-950 border-2 flex items-center justify-center text-[10px] shadow-xl"
                 style={{ borderColor: qrConfig.fgColor || '#a855f7' }}
               >
                 {qrConfig.logoText || '⚡'}
@@ -118,28 +118,28 @@ export default function QRModal({ isOpen, onClose, profileData }) {
           </div>
 
           {qrConfig.frameText && (
-            <p className="mt-3 text-[11px] font-bold text-indigo-400 tracking-wider uppercase text-center">
+            <p className="mt-2 text-[10px] font-bold text-indigo-400 tracking-wider uppercase text-center">
               {qrConfig.frameText}
             </p>
           )}
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 pt-0.5">
           <button
             onClick={handleDownload}
-            className="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl flex items-center justify-center space-x-1.5 shadow-md shadow-indigo-600/20 transition-all"
+            className="py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-lg flex items-center justify-center space-x-1 shadow-md shadow-indigo-600/20 transition-all"
           >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download PNG</span>
+            <Download className="w-3 h-3" />
+            <span>Download</span>
           </button>
 
           <button
             onClick={handleCopy}
-            className="py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl flex items-center justify-center space-x-1.5 border border-slate-700 transition-all"
+            className="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg flex items-center justify-center space-x-1 border border-slate-700 transition-all"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? "Copied!" : "Copy QR"}</span>
+            {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+            <span>{copied ? "Copied!" : "Copy"}</span>
           </button>
         </div>
 

@@ -14,7 +14,7 @@ import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { DEFAULT_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl, decodeProfileData } from './utils/url';
+import { getProfileHash, getProfileUrl, decodeProfileData, encodeProfileData } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -412,7 +412,17 @@ export default function App() {
       />
 
       {/* Main View Layout */}
-      {viewMode === 'preview' ? (
+      {viewMode === 'bulk' ? (
+        <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
+          <BulkAdminDashboard
+            members={membersList}
+            authRole={authRole}
+            onUpdateMembers={setMembersList}
+            onSelectMemberToEdit={handleSelectMemberToEdit}
+            onViewMemberProfile={handleViewMemberProfile}
+          />
+        </main>
+      ) : viewMode === 'preview' ? (
         // Front Page Welcome Landing vs Public Linktree View
         <main className="flex-1 w-full flex flex-col items-center justify-center relative">
           {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (

@@ -9,7 +9,8 @@ import {
   Unlock,
   KeyRound,
   Eye,
-  Sliders
+  Sliders,
+  Users
 } from 'lucide-react';
 
 export default function Header({ 
@@ -107,6 +108,16 @@ export default function Header({
           >
             {isUnlocked ? <Unlock className="w-3.5 h-3.5 text-emerald-400" /> : <Lock className="w-3.5 h-3.5 text-indigo-400" />}
             <span className="hidden sm:inline">{isUnlocked ? "Account Active" : "Log In / Sign Up"}</span>
+          </button>
+
+          {/* LinkStack Multi-user Directory Button */}
+          <button
+            onClick={() => setViewMode(viewMode === 'bulk' ? 'preview' : 'bulk')}
+            className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-xs font-medium rounded-xl transition-all whitespace-nowrap"
+            title="Multi-User Directory & Bulk Admin Panel"
+          >
+            <Users className="w-4 h-4 text-purple-400" />
+            <span className="hidden lg:inline">{viewMode === 'bulk' ? 'View Card' : 'Directory'}</span>
           </button>
 
           {/* Export / Import Button */}

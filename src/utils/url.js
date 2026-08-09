@@ -169,11 +169,18 @@ export const decodeProfileData = (hashStr = '') => {
   }
 };
 
-export const getProfileUrl = (profileData = {}) => {
+export const getShortProfileUrl = (profileData = {}) => {
   const hash = getProfileHash(profileData);
-  const encodedParam = encodeProfileData(profileData);
-  if (encodedParam) {
-    return `${window.location.origin}${window.location.pathname}${hash}?${encodedParam}`;
+  return `${window.location.origin}${window.location.pathname}${hash}`;
+};
+
+export const getProfileUrl = (profileData = {}, includeFullPayload = false) => {
+  const hash = getProfileHash(profileData);
+  if (includeFullPayload) {
+    const encodedParam = encodeProfileData(profileData);
+    if (encodedParam && encodedParam.length < 1800) {
+      return `${window.location.origin}${window.location.pathname}${hash}?${encodedParam}`;
+    }
   }
   return `${window.location.origin}${window.location.pathname}${hash}`;
 };

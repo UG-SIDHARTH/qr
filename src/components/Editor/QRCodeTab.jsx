@@ -14,7 +14,7 @@ import {
   Share2
 } from 'lucide-react';
 import { generateVCard } from '../../utils/vcard';
-import { getProfileUrl } from '../../utils/url';
+import { getProfileUrl, getShortProfileUrl } from '../../utils/url';
 
 export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
   const canvasRef = useRef(null);
@@ -33,8 +33,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
       const vcard = generateVCard(profile, socials);
       if (vcard) return vcard;
     }
-    const url = getProfileUrl({ profile, socials, qrConfig });
-    return url || `${window.location.origin}${window.location.pathname}#profile`;
+    return getShortProfileUrl({ profile, socials, qrConfig });
   };
 
   const encodedData = getEncodedContent();
@@ -48,7 +47,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
         canvasRef.current,
         encodedData || `${window.location.origin}#profile`,
         {
-          width: 260,
+          width: 190,
           margin: 2,
           color: {
             dark: qrConfig?.fgColor || '#a855f7',
@@ -63,7 +62,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
             QRCode.toCanvas(
               canvasRef.current,
               encodedData || `${window.location.origin}#profile`,
-              { width: 260, margin: 2, errorCorrectionLevel: 'L' }
+              { width: 190, margin: 2, errorCorrectionLevel: 'L' }
             ).catch(() => {});
           }
         }
@@ -287,23 +286,23 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
         </div>
 
         {/* Right: Live Canvas Preview & Export */}
-        <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-slate-900/80 rounded-3xl border border-slate-800 space-y-4">
+        <div className="lg:col-span-5 flex flex-col items-center justify-center p-4 bg-slate-900/80 rounded-3xl border border-slate-800 space-y-3.5">
           
           {/* Framed QR Code Render Box */}
           <div 
-            className="p-5 rounded-3xl flex flex-col items-center justify-center shadow-2xl border transition-all"
+            className="p-3.5 rounded-2xl flex flex-col items-center justify-center shadow-xl border transition-all"
             style={{ 
               backgroundColor: qrConfig.bgColor || '#090d16',
               borderColor: qrConfig.fgColor + '40'
             }}
           >
-            <div className="relative p-3 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center">
-              <canvas ref={canvasRef} className="rounded-xl" />
+            <div className="relative p-2 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center">
+              <canvas ref={canvasRef} className="rounded-lg" />
               
               {/* Center Logo Overlay */}
               {qrConfig.includeLogo && (
                 <div 
-                  className="absolute inset-0 m-auto w-10 h-10 rounded-xl bg-slate-950 border-2 flex items-center justify-center text-sm shadow-xl"
+                  className="absolute inset-0 m-auto w-8 h-8 rounded-lg bg-slate-950 border-2 flex items-center justify-center text-xs shadow-xl"
                   style={{ borderColor: qrConfig.fgColor }}
                 >
                   {qrConfig.logoText || '⚡'}
@@ -313,7 +312,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
 
             {/* Frame Text Banner */}
             {qrConfig.frameText && (
-              <div className="mt-4 px-4 py-1.5 bg-indigo-600 text-white font-outfit text-xs font-bold rounded-xl tracking-wider uppercase text-center shadow-md">
+              <div className="mt-3 px-3 py-1 bg-indigo-600 text-white font-outfit text-[11px] font-bold rounded-lg tracking-wider uppercase text-center shadow-md">
                 {qrConfig.frameText}
               </div>
             )}
