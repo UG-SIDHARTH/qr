@@ -144,5 +144,32 @@ export const THEME_PRESETS = [
     accentColor: "#4f46e5",
     buttonRadius: "rounded-2xl",
     previewColor: "from-slate-100 to-slate-200",
+  },
+  {
+    id: "aurora-borealis",
+    name: "Aurora Borealis",
+    bgStyle: "bg-preset-aurora",
+    cardStyle: "glass-card",
+    accentColor: "#2dd4bf",
+    buttonRadius: "rounded-2xl",
+    previewColor: "from-teal-950 via-emerald-900 to-cyan-950",
+  },
+  {
+    id: "cyberpunk-neon",
+    name: "Cyberpunk Neon",
+    bgStyle: "bg-preset-cyberpunk",
+    cardStyle: "bg-black/90 border border-yellow-400/50 shadow-yellow-500/20",
+    accentColor: "#facc15",
+    buttonRadius: "rounded-md",
+    previewColor: "from-yellow-950 via-zinc-950 to-black",
+  },
+  {
+    id: "nordic-frost",
+    name: "Nordic Frost",
+    bgStyle: "bg-preset-nordic",
+    cardStyle: "glass-card",
+    accentColor: "#38bdf8",
+    buttonRadius: "rounded-xl",
+    previewColor: "from-sky-950 via-slate-900 to-indigo-950",
   }
 ];

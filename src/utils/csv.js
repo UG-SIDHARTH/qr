@@ -44,7 +44,7 @@ export function parseCSVToMembers(csvText) {
 
   for (let i = 1; i < lines.length; i++) {
     // Regex to parse comma-separated fields with quotes
-    const values = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(',');
+    const values = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || lines[i].split(',');
     const cleanValues = values.map(v => v ? v.replace(/^"|"$/g, '').trim() : '');
 
     const name = cleanValues[1] || cleanValues[0] || `Member ${i}`;

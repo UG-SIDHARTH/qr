@@ -103,3 +103,15 @@
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
   color: #0f172a;
 }
+
+.bg-preset-aurora {
+  background: linear-gradient(135deg, #042f2e 0%, #064e3b 40%, #083344 100%);
+}
+
+.bg-preset-cyberpunk {
+  background: linear-gradient(135deg, #0a0a00 0%, #1c1917 60%, #451a03 100%);
+}
+
+.bg-preset-nordic {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c4a6e 100%);
+}

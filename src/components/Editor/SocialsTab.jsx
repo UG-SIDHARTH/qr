@@ -26,6 +26,11 @@ const PRESET_PLATFORMS = [
   { name: 'Twitter / X', platform: 'twitter', icon: 'Twitter', color: '#1da1f2', defaultUrl: 'https://x.com/', subtitle: 'Social Profile' },
   { name: 'Instagram', platform: 'instagram', icon: 'Instagram', color: '#e1306c', defaultUrl: 'https://instagram.com/', subtitle: 'Photos & Stories' },
   { name: 'YouTube', platform: 'youtube', icon: 'Youtube', color: '#ff0000', defaultUrl: 'https://youtube.com/@', subtitle: 'Video Channel' },
+  { name: 'TikTok', platform: 'tiktok', icon: 'Music', color: '#000000', defaultUrl: 'https://tiktok.com/@', subtitle: 'Short Videos & Reels' },
+  { name: 'Discord', platform: 'discord', icon: 'MessageSquare', color: '#5865f2', defaultUrl: 'https://discord.gg/', subtitle: 'Community Server' },
+  { name: 'Spotify', platform: 'spotify', icon: 'Music', color: '#1db954', defaultUrl: 'https://open.spotify.com/', subtitle: 'Music & Playlists' },
+  { name: 'Twitch', platform: 'twitch', icon: 'Tv', color: '#9146ff', defaultUrl: 'https://twitch.tv/', subtitle: 'Live Streams' },
+  { name: 'Email', platform: 'email', icon: 'Mail', color: '#ea4335', defaultUrl: 'mailto:', subtitle: 'Direct Email Contact' },
   { name: 'Website', platform: 'website', icon: 'Globe', color: '#4f46e5', defaultUrl: 'https://', subtitle: 'Personal Website' },
 ];
 

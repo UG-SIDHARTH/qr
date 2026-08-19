@@ -180,7 +180,7 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
 
           {/* Color Wheel Customizer */}
           <div className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-3">
-            <label className="block text-xs font-semibold text-slate-200">QR Color Wheel Palette</label>
+            <label className="block text-xs font-semibold text-slate-200">QR Color Palette & Presets</label>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -234,6 +234,61 @@ export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Quick Color Palette Presets */}
+            <div className="pt-2 border-t border-slate-800">
+              <span className="block text-[11px] font-medium text-slate-400 mb-1.5">Quick Palette Presets</span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { name: 'Cyber Purple', fg: '#a855f7', bg: '#090d16' },
+                  { name: 'Emerald Neon', fg: '#10b981', bg: '#022c22' },
+                  { name: 'Ocean Cyan', fg: '#38bdf8', bg: '#0c4a6e' },
+                  { name: 'Sunset Coral', fg: '#f43f5e', bg: '#4c0519' },
+                  { name: 'Dark Gold', fg: '#facc15', bg: '#1c1917' },
+                  { name: 'Classic Black', fg: '#000000', bg: '#ffffff' },
+                ].map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => {
+                      handleUpdate('fgColor', preset.fg);
+                      handleUpdate('bgColor', preset.bg);
+                    }}
+                    className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 rounded-lg flex items-center space-x-1.5 border border-slate-700 transition-all"
+                  >
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: preset.fg }} />
+                    <span>{preset.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Error Correction Level Selector */}
+          <div className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800 space-y-2">
+            <label className="block text-xs font-semibold text-slate-200">Error Correction Level (ECC)</label>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { level: 'L', name: 'Low (7%)' },
+                { level: 'M', name: 'Med (15%)' },
+                { level: 'Q', name: 'Quart (25%)' },
+                { level: 'H', name: 'High (30%)' },
+              ].map((item) => (
+                <button
+                  key={item.level}
+                  type="button"
+                  onClick={() => handleUpdate('errorCorrectionLevel', item.level)}
+                  className={`py-1.5 text-center text-xs font-medium rounded-xl border transition-all ${
+                    (qrConfig.errorCorrectionLevel || 'H') === item.level
+                      ? 'bg-purple-600/30 border-purple-500 text-purple-200 shadow-md'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <div className="font-bold">{item.level}</div>
+                  <div className="text-[10px] opacity-75">{item.name}</div>
+                </button>
+              ))}
             </div>
           </div>
 
