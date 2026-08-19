@@ -52,15 +52,6 @@ export default function WelcomeLanding({ onCreateLinktree, onOpenQR }) {
             <ArrowRight className="w-4 h-4 text-white" />
           </button>
 
-          {/* Secondary Transparent Glass Button with White/Cyan Border */}
-          <button
-            onClick={onOpenQR}
-            className="w-full sm:w-auto px-6 py-3.5 bg-white/[0.05] hover:bg-white/10 text-slate-200 hover:text-white font-semibold text-xs sm:text-sm rounded-2xl border border-white/20 hover:border-cyan-400/70 shadow-[0_15px_30px_rgba(0,0,0,0.3)] backdrop-blur-md flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-1 active:scale-95 cursor-pointer"
-          >
-            <QrCode className="w-4 h-4 text-cyan-400" />
-            <span>Show QR Code</span>
-          </button>
-
         </div>
 
         {/* Bottom Floating Glass Feature Tiles */}
