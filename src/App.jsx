@@ -35,7 +35,7 @@ const MEMBERS_STORAGE_KEY = 'qr_linktree_members_list_v7';
 
 // Helper to resolve route and member from URL hash
 const resolveHashUrl = (hash, members = [], activeProfile = null) => {
-  if (!hash) return { view: 'preview' };
+  if (!hash || hash === '#' || hash === '#home') return { view: 'home' };
 
   // 1. First priority: Check if URL hash contains an encoded full profile payload (?p=...)
   const decodedMember = decodeProfileData(hash);
@@ -44,7 +44,7 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
   }
 
   const cleanHash = decodeURIComponent(hash.replace(/^#/, '')).split('?')[0].trim();
-  if (!cleanHash) return { view: 'preview' };
+  if (!cleanHash || cleanHash === 'home') return { view: 'home' };
 
   // 2. Check system routes
   if (cleanHash === 'bulk' || cleanHash === 'admin' || cleanHash === 'members') {
@@ -209,6 +209,8 @@ export default function App() {
         }
       } else if (state.view === 'editor') {
         setViewMode('editor');
+      } else if (state.view === 'home') {
+        setViewMode('home');
       }
     };
 
@@ -316,6 +318,62 @@ export default function App() {
   const handleRegisterUser = (newUser) => {
     setMembersList(prev => [newUser, ...prev]);
     setProfileData(newUser);
+    setIsUnlocked(true);
+    setAuthRole('admin');
+    setViewMode('editor');
+    setActiveTab('profile');
+    window.history.replaceState(null, '', '#editor');
+  };
+
+  const handleCreateNewProfile = () => {
+    const blankMember = {
+      id: `user_${Date.now()}`,
+      employeeId: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
+      department: 'User Created',
+      profile: {
+        name: '',
+        username: '',
+        title: '',
+        avatar: '',
+        bio: '',
+        location: '',
+        email: '',
+        phone: '',
+        verified: false,
+        statusText: '',
+        adminPin: '1234',
+      },
+      socials: [],
+      portfolio: [],
+      theme: {
+        id: 'midnight-glass',
+        name: 'Midnight Glass',
+        bgStyle: 'bg-preset-midnight',
+        cardStyle: 'glass-card',
+        accentColor: '#6366f1',
+        buttonRadius: 'rounded-2xl',
+        buttonGlow: true,
+      },
+      qrConfig: {
+        mode: 'url',
+        fgColor: '#a855f7',
+        bgColor: '#090d16',
+        dotStyle: 'rounded',
+        cornerStyle: 'rounded',
+        frameText: 'SCAN MY PROFILE',
+        frameColor: '#6366f1',
+        logoText: '⚡',
+        includeLogo: true,
+        errorCorrectionLevel: 'H',
+      }
+    };
+
+    setProfileData(blankMember);
+    setIsUnlocked(true);
+    setAuthRole('admin');
+    setViewMode('editor');
+    setActiveTab('profile');
+    window.history.replaceState(null, '', '#editor');
   };
 
   const handleSelectMemberToEdit = (member) => {
@@ -406,6 +464,7 @@ export default function App() {
           onOpenExport={() => setIsExportModalOpen(true)}
           onQuickQR={() => setIsQRModalOpen(true)}
           onPublish={handlePublishProfile}
+          onCreateNew={handleCreateNewProfile}
           profile={profileData.profile}
           isUnlocked={isUnlocked}
           onRequestUnlock={() => setIsAuthModalOpen(true)}
@@ -414,7 +473,15 @@ export default function App() {
       )}
 
       {/* Main View Layout */}
-      {viewMode === 'bulk' ? (
+      {viewMode === 'home' ? (
+        // Root Welcome Landing Page (Homescreen)
+        <main className="flex-1 w-full flex flex-col items-center justify-center relative">
+          <WelcomeLanding
+            onCreateLinktree={handleCreateNewProfile}
+            onOpenQR={() => setIsQRModalOpen(true)}
+          />
+        </main>
+      ) : viewMode === 'bulk' ? (
         <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
           <BulkAdminDashboard
             members={membersList}
@@ -425,21 +492,14 @@ export default function App() {
           />
         </main>
       ) : viewMode === 'preview' ? (
-        // Front Page Welcome Landing vs Public Linktree View
+        // Public Standalone Bio Page
         <main className="flex-1 w-full flex flex-col items-center justify-center relative">
-          {(profileData.profile?.name || profileData.profile?.username || profileData.socials?.length > 0) ? (
-            <BioPage 
-              profileData={profileData} 
-              onOpenQR={() => setIsQRModalOpen(true)} 
-              onOpenEditor={() => handleSetViewMode('editor')}
-              isFullView={true} 
-            />
-          ) : (
-            <WelcomeLanding
-              onCreateLinktree={() => handleSetViewMode('editor')}
-              onOpenQR={() => setIsQRModalOpen(true)}
-            />
-          )}
+          <BioPage 
+            profileData={profileData} 
+            onOpenQR={() => setIsQRModalOpen(true)} 
+            onOpenEditor={() => handleSetViewMode('editor')}
+            isFullView={true} 
+          />
         </main>
       ) : (
         // Studio & Editor Mode (Split Pane)
