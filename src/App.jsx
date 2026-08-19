@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import ProfileTab from './components/Editor/ProfileTab';
 import SocialsTab from './components/Editor/SocialsTab';
@@ -99,20 +99,21 @@ const resolveHashUrl = (hash, members = [], activeProfile = null) => {
       socials: [],
       portfolio: [],
       theme: {
-        id: 'midnight-glass',
-        name: 'Midnight Glass',
-        bgStyle: 'bg-preset-midnight',
-        accentColor: '#6366f1',
-        buttonRadius: 'rounded-2xl',
-        buttonGlow: true
+        id: "midnight-glass",
+        name: "Midnight Glass",
+        bgStyle: "bg-preset-midnight",
+        cardStyle: "glass-card",
+        accentColor: "#6366f1",
+        buttonRadius: "rounded-2xl",
+        fontFamily: "font-sans",
+        buttonGlow: true,
       }
     }
   };
 };
 
 export default function App() {
-  // Members directory list loaded from localStorage or default 100 members
-  // Members directory list loaded from localStorage or empty array
+  // Members List loaded from localStorage
   const [membersList, setMembersList] = useState(() => {
     try {
       const saved = localStorage.getItem(MEMBERS_STORAGE_KEY);
@@ -120,7 +121,7 @@ export default function App() {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-    } catch (e) {}
+    } catch {}
     return [DEFAULT_PROFILE];
   });
 
@@ -142,7 +143,7 @@ export default function App() {
           };
         }
       }
-    } catch (e) {}
+    } catch {}
 
     const initialMembers = (() => {
       try {
@@ -151,7 +152,7 @@ export default function App() {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) return parsed;
         }
-      } catch (e) {}
+      } catch {}
       return [];
     })();
 
@@ -160,6 +161,17 @@ export default function App() {
 
     return savedProfile;
   });
+
+  const membersListRef = useRef(membersList);
+  const profileDataRef = useRef(profileData);
+
+  useEffect(() => {
+    membersListRef.current = membersList;
+  }, [membersList]);
+
+  useEffect(() => {
+    profileDataRef.current = profileData;
+  }, [profileData]);
 
   const checkHashUrl = () => resolveHashUrl(window.location.hash, membersList, profileData);
 
@@ -176,7 +188,7 @@ export default function App() {
   // Sync state with URL hash on mount and hashchange
   useEffect(() => {
     const handleHashChange = () => {
-      const state = resolveHashUrl(window.location.hash, membersList, profileData);
+      const state = resolveHashUrl(window.location.hash, membersListRef.current, profileDataRef.current);
       if (state.member) {
         setProfileData(state.member);
         setViewMode('preview');
@@ -191,7 +203,7 @@ export default function App() {
               const updated = [state.member, ...prev];
               try {
                 localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(updated));
-              } catch (e) {}
+              } catch {}
               return updated;
             }
             return prev;
@@ -220,7 +232,7 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
-    } catch (e) {}
+    } catch {}
 
     const name = profileData.profile?.name?.trim();
     const username = profileData.profile?.username?.trim().toLowerCase().replace(/^#/, '');
@@ -251,13 +263,13 @@ export default function App() {
           newMembers[existingIdx] = updatedRecord;
           try {
             localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
-          } catch (e) {}
+          } catch {}
           return newMembers;
         } else {
           const newMembers = [updatedRecord, ...prev];
           try {
             localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
-          } catch (e) {}
+          } catch {}
           return newMembers;
         }
       });
@@ -267,7 +279,7 @@ export default function App() {
   useEffect(() => {
     try {
       localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(membersList));
-    } catch (e) {}
+    } catch {}
   }, [membersList]);
 
   // Handlers for profile updates
@@ -429,7 +441,7 @@ export default function App() {
 
       try {
         localStorage.setItem(MEMBERS_STORAGE_KEY, JSON.stringify(newMembers));
-      } catch (e) {}
+      } catch {}
 
       return newMembers;
     });

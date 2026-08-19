@@ -27,7 +27,7 @@ function SingleMemberQRCard({ member }) {
         if (err) console.error("Batch Canvas Error:", err);
       }
     );
-  }, [member, profileUrl]);
+  }, [member, profileUrl, qrConfig?.fgColor, qrConfig?.bgColor]);
 
   return (
     <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-between text-center shadow-lg hover:border-indigo-500/50 transition-all">

@@ -7,6 +7,7 @@ A self-hosted, open-source Linktree-style digital bio card page with built-in QR
 ## ⚡ Features
 
 - 🔗 **Standalone Bio Link Cards**: Clean, modern digital bio pages showcasing social profiles, custom links, tags, and portfolio items.
+- 🏠 **Homescreen & Landing Page**: Hero section with interactive feature tiles, quick card creation, and brand navigation.
 - 📱 **QR Code Studio & Generator**: Instant QR code generation powered by `qrcode` with:
   - Mode toggles: Public Linktree URL vs Mobile Contact vCard.
   - Foreground & background color pickers + Quick Palette Presets (*Cyber Purple*, *Emerald Neon*, *Ocean Cyan*, *Sunset Coral*, *Dark Gold*, *Classic Black*).
@@ -21,7 +22,7 @@ A self-hosted, open-source Linktree-style digital bio card page with built-in QR
   - Passcode-protected admin access (`VITE_ADMIN_PASSCODE` & `VITE_SUPER_ADMIN_PASSCODE`).
   - User registration & login.
   - CSV import/export for bulk organization directories.
-- 🧪 **Comprehensive Test Suite**: Unit & integration tests powered by **Vitest**, **React Testing Library**, and **jsdom**.
+- 🧪 **Comprehensive Test Suite & Zero-Warning Linting**: 100% passing Unit & integration tests powered by **Vitest**, **React Testing Library**, and **ESLint 9**.
 - 🐳 **Docker Containerization**: Includes `Dockerfile` and `docker-compose.yml` for effortless deployment.
 
 ---
@@ -34,7 +35,7 @@ A self-hosted, open-source Linktree-style digital bio card page with built-in QR
 - **Icons:** `lucide-react`
 - **QR Engine:** `qrcode`
 - **Testing:** Vitest, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`
-- **Linter:** ESLint 9 (`eslint.config.js`)
+- **Linter:** ESLint 9 (`eslint.config.js`) — 0 errors, 0 warnings
 - **Deployment:** Docker & Docker Compose
 
 ---
@@ -87,19 +88,27 @@ In the project directory, you can run:
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Testing & Code Quality
 
-To run the full Vitest suite:
+### Running Unit & Component Tests
 
 ```bash
 npm test
 ```
 
-Test coverage includes:
+Test suite coverage (13 passed out of 13 tests):
 - **`url.test.js`**: Profile hash resolution, UTF-8 Base64 encoding & decoding.
 - **`vcard.test.js`**: vCard v3.0 text formatting.
 - **`csv.test.js`**: CSV line parsing & member directory mapping.
 - **`Header.test.jsx`**: React component navigation rendering.
+
+### Code Quality Audit (`npm run lint`)
+
+Static analysis is verified using ESLint 9 flat configuration with **0 errors and 0 warnings**:
+
+```bash
+npm run lint
+```
 
 ---
 
@@ -138,6 +147,7 @@ qr/
 │   └── utils/             # URL encoding, vCard, and CSV helpers
 │       └── __tests__/     # Utility unit tests
 ├── dist/                  # Production build output
+├── .env                   # Local environment passcodes (git-ignored)
 ├── .env.example           # Environment template
 ├── Dockerfile             # Container definition
 ├── docker-compose.yml     # Docker orchestration

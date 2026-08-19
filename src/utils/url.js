@@ -29,7 +29,7 @@ const utf8ToBase64 = (str) => {
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=+$/, '');
-  } catch (_e) {
+  } catch {
     return "";
   }
 };
@@ -45,7 +45,7 @@ const base64ToUtf8 = (base64Str) => {
       bytes[i] = binString.charCodeAt(i);
     }
     return new TextDecoder().decode(bytes);
-  } catch (_e) {
+  } catch {
     return "";
   }
 };

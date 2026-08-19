@@ -25,7 +25,7 @@ export default class ErrorBoundary extends React.Component {
     try {
       localStorage.removeItem('qr_linktree_profile_data_v7');
       localStorage.removeItem('qr_linktree_members_list_v7');
-    } catch (e) {}
+    } catch {}
     this.setState({ hasError: false, error: null });
     window.location.hash = '';
     window.location.reload();
