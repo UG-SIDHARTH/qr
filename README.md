@@ -1,28 +1,45 @@
-# QR Linktree Generator
+# BioLink QR — Open Source Linktree & QR Code Studio
 
-A self-hosted, open-source Linktree-style link page with built-in QR code generation — built with React, Vite, and Tailwind CSS. Admin-protected editing lets you manage your links without a database or third-party service.
+A self-hosted, open-source Linktree-style digital bio card page with built-in QR code generation, theme styling, vCard contact downloads, and multi-user administration — built with React 18, Vite 5, Tailwind CSS, and Vitest.
 
-## Features
+---
 
-- 🔗 Linktree-style landing page for your links/socials
-- 📱 Built-in QR code generation (via the `qrcode` library) for sharing your page or individual links
-- 🔐 Two-tier access control — standard admin and super admin passcodes, plus user account registration & login (Username/Email & Password)
-- 📇 Instant vCard (Phone Contact) generation and download
-- ⚡ Fast dev/build tooling with Vite
-- 🎨 Styled with Tailwind CSS, icons via `lucide-react`
-- 🐳 Docker & Docker Compose support for easy deployment
-- 🧩 No backend/database required — lightweight, static-friendly deployment
+## ⚡ Features
 
-## Tech Stack
+- 🔗 **Standalone Bio Link Cards**: Clean, modern digital bio pages showcasing social profiles, custom links, tags, and portfolio items.
+- 📱 **QR Code Studio & Generator**: Instant QR code generation powered by `qrcode` with:
+  - Mode toggles: Public Linktree URL vs Mobile Contact vCard.
+  - Foreground & background color pickers + Quick Palette Presets (*Cyber Purple*, *Emerald Neon*, *Ocean Cyan*, *Sunset Coral*, *Dark Gold*, *Classic Black*).
+  - Error Correction Level (ECC) selector (`L`, `M`, `Q`, `H`).
+  - Customizable center logo/emoji overlay.
+  - One-click **PNG Image**, **Vector SVG**, and **Clipboard Copy** exports.
+- 🎨 **11+ Premium Theme Presets**:
+  - *Midnight Glass*, *Cyber Neon*, *Emerald Luxe*, *Sunset Glow*, *Retro Wave*, *Solar Flare*, *Minimalist Dark*, *Clean Light*, *Aurora Borealis*, *Cyberpunk Neon*, and *Nordic Frost*.
+- 📇 **Instant vCard Generation**: Scans or downloads `.vcf` phone contact files directly into iOS/Android address books.
+- 🌐 **Zero-Backend URL Payload Sharing**: Full profile encoding into URL hash parameters (`?p=...`) for instant sharing without third-party servers or databases.
+- 🔐 **Admin & Directory Roster**:
+  - Passcode-protected admin access (`VITE_ADMIN_PASSCODE` & `VITE_SUPER_ADMIN_PASSCODE`).
+  - User registration & login.
+  - CSV import/export for bulk organization directories.
+- 🧪 **Comprehensive Test Suite**: Unit & integration tests powered by **Vitest**, **React Testing Library**, and **jsdom**.
+- 🐳 **Docker Containerization**: Includes `Dockerfile` and `docker-compose.yml` for effortless deployment.
 
-- **Frontend:** React 18
-- **Build tool:** Vite 5
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React 18, HTML5, CSS3
+- **Build System:** Vite 5
 - **Styling:** Tailwind CSS, PostCSS, Autoprefixer
-- **Icons:** lucide-react
-- **QR codes:** qrcode
-- **Containerization:** Docker / Docker Compose
+- **Icons:** `lucide-react`
+- **QR Engine:** `qrcode`
+- **Testing:** Vitest, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`
+- **Linter:** ESLint 9 (`eslint.config.js`)
+- **Deployment:** Docker & Docker Compose
 
-## Getting Started
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -40,47 +57,62 @@ cd qr
 npm install
 ```
 
-### Environment Variables
+### Environment Configuration
 
-Copy the example env file and set your own passcodes:
+Copy `.env.example` to `.env` and configure your access passcodes:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable                     | Description                                  |
-| ----------------------------- | --------------------------------------------- |
-| `VITE_ADMIN_PASSCODE`        | Passcode for standard admin access            |
-| `VITE_SUPER_ADMIN_PASSCODE`  | Passcode for master/super admin access        |
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `VITE_ADMIN_PASSCODE` | Passcode for standard admin access | `123456` |
+| `VITE_SUPER_ADMIN_PASSCODE` | Master passcode for super admin panel | `31072007` |
 
-> ⚠️ Never commit your `.env` file or real passcodes to version control.
+---
 
-### Development
+## 💻 Available Scripts
 
-Start the local dev server (runs on port `8083`):
+In the project directory, you can run:
+
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Runs the Vite local development server on `http://localhost:8083` |
+| `npm run build` | Bundles production assets into the `dist/` directory |
+| `npm run preview` | Serves the production `dist/` build locally |
+| `npm test` | Runs the unit & component test suite with Vitest |
+| `npm run test:watch` | Runs Vitest in interactive watch mode |
+| `npm run lint` | Runs ESLint 9 static code analysis |
+
+---
+
+## 🧪 Running Tests
+
+To run the full Vitest suite:
 
 ```bash
-npm run dev
+npm test
 ```
 
-Then open [http://localhost:8083](http://localhost:8083) in your browser.
+Test coverage includes:
+- **`url.test.js`**: Profile hash resolution, UTF-8 Base64 encoding & decoding.
+- **`vcard.test.js`**: vCard v3.0 text formatting.
+- **`csv.test.js`**: CSV line parsing & member directory mapping.
+- **`Header.test.jsx`**: React component navigation rendering.
 
-### Production Build
+---
+
+## 🐳 Docker Deployment
+
+To build and run the application inside a container:
 
 ```bash
-npm run build
-npm run preview
-```
-
-## Running with Docker
-
-The project ships with a `Dockerfile` and `docker-compose.yml` for containerized deployment.
-
-```bash
+# Build and start container in detached mode
 docker compose up -d --build
 ```
 
-This builds the app and serves it on **[http://localhost:8083](http://localhost:8083)** (mapped to port `80` inside the container).
+The application will be accessible at **`http://localhost:8083`** (mapped to port `80` inside NGINX).
 
 To stop the container:
 
@@ -88,38 +120,55 @@ To stop the container:
 docker compose down
 ```
 
-## Project Structure
+---
 
-```
+## 📁 Project Structure
+
+```text
 qr/
-├── src/                 # Application source code
-├── dist/                # Production build output
-├── .vscode/             # Editor settings
-├── .env.example         # Example environment variables
-├── Dockerfile            # Container build definition
-├── docker-compose.yml    # Container orchestration
-├── index.html            # App entry HTML
-├── tailwind.config.js    # Tailwind CSS configuration
-├── postcss.config.js     # PostCSS configuration
-├── vite.config.js        # Vite configuration
-└── package.json
+├── src/
+│   ├── components/
+│   │   ├── Admin/         # Bulk directory & QR export dashboard
+│   │   ├── Editor/        # Profile, Socials, Portfolio, Theme, QR tabs
+│   │   ├── Modals/        # Auth, Export, QR, and Publish modals
+│   │   ├── Preview/       # BioPage, PhoneMockup, WelcomeLanding
+│   │   └── __tests__/     # React component test suites
+│   ├── data/              # Default profile & theme presets data
+│   ├── test/              # Vitest setup file
+│   └── utils/             # URL encoding, vCard, and CSV helpers
+│       └── __tests__/     # Utility unit tests
+├── dist/                  # Production build output
+├── .env.example           # Environment template
+├── Dockerfile             # Container definition
+├── docker-compose.yml     # Docker orchestration
+├── eslint.config.js       # ESLint 9 flat configuration
+├── index.html             # App HTML entrypoint
+├── package.json           # Dependencies & scripts
+├── tailwind.config.js     # Tailwind CSS configuration
+└── vite.config.js         # Vite & Vitest configuration
 ```
 
-## Contributing
+---
+
+## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m 'Add my feature'`)
-4. Push to the branch (`git push origin feature/my-feature`)
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+---
 
-No license has been specified yet for this repository. Consider adding a `LICENSE` file (e.g., MIT) to clarify usage terms for contributors and users.
+## 📄 License
 
-## Author
+This project is open-source under the [MIT License](LICENSE).
+
+---
+
+## 👤 Author
 
 **UG-SIDHARTH**
-[GitHub](https://github.com/UG-SIDHARTH)
+- GitHub: [@UG-SIDHARTH](https://github.com/UG-SIDHARTH)

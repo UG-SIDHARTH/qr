@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
-import { X, Check, Copy, ExternalLink, Sparkles, QrCode, Download } from 'lucide-react';
+import { X, Check, Copy, ExternalLink, Sparkles, Download } from 'lucide-react';
 import { getProfileUrl } from '../../utils/url';
 
 export default function PublishSuccessModal({ isOpen, onClose, profileData, onViewLive }) {

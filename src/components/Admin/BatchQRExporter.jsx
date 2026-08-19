@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
-import { X, Printer, Download, Sparkles, UserCheck } from 'lucide-react';
+import { X, Printer, Sparkles } from 'lucide-react';
 
 function SingleMemberQRCard({ member }) {
   const canvasRef = useRef(null);

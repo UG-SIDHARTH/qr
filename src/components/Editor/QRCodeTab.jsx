@@ -3,18 +3,13 @@ import QRCode from 'qrcode';
 import { 
   QrCode, 
   Download, 
-  Palette, 
-  Sparkles, 
-  Type, 
-  PhoneCall, 
   Globe, 
   UserCheck, 
   Copy, 
-  Check,
-  Share2
+  Check
 } from 'lucide-react';
 import { generateVCard } from '../../utils/vcard';
-import { getProfileUrl, getShortProfileUrl } from '../../utils/url';
+import { getShortProfileUrl } from '../../utils/url';
 
 export default function QRCodeTab({ qrConfig, onChange, profile, socials }) {
   const canvasRef = useRef(null);

@@ -14,7 +14,7 @@ import AdminAuthModal from './components/Modals/AdminAuthModal';
 import PublishSuccessModal from './components/Modals/PublishSuccessModal';
 import BulkAdminDashboard from './components/Admin/BulkAdminDashboard';
 import { DEFAULT_PROFILE } from './data/defaultProfile';
-import { getProfileHash, getProfileUrl, decodeProfileData, encodeProfileData } from './utils/url';
+import { getProfileHash, decodeProfileData, encodeProfileData } from './utils/url';
 import { 
   User, 
   Share2, 
@@ -23,10 +23,6 @@ import {
   QrCode, 
   Smartphone, 
   Eye,
-  Sliders,
-  Users,
-  Building2,
-  Trash2,
   Sparkles
 } from 'lucide-react';
 

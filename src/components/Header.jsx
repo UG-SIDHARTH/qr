@@ -2,13 +2,10 @@ import React from 'react';
 import { 
   Share2, 
   Download, 
-  RotateCcw, 
   QrCode,
   Check,
   Lock,
   Unlock,
-  KeyRound,
-  Eye,
   Sliders,
   Users,
   Plus
@@ -18,11 +15,9 @@ export default function Header({
   viewMode, 
   setViewMode, 
   onOpenExport, 
-  onReset, 
   onQuickQR,
   onPublish,
   onCreateNew,
-  profile,
   isUnlocked,
   onRequestUnlock
 }) {

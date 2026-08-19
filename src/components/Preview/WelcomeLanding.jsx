@@ -1,7 +1,7 @@
 import React from 'react';
 import { QrCode, Sliders, Sparkles, ArrowRight, Network } from 'lucide-react';
 
-export default function WelcomeLanding({ onCreateLinktree, onOpenQR }) {
+export default function WelcomeLanding({ onCreateLinktree }) {
   return (
     <div className="relative w-full min-h-[calc(100vh-4.5rem)] flex flex-col items-center justify-center p-4 sm:p-8 bg-[#060713] text-white overflow-hidden select-none">
       

@@ -2,12 +2,10 @@ import React from 'react';
 import { 
   BadgeCheck, 
   MapPin, 
-  Share2, 
   QrCode, 
   UserPlus, 
   ArrowUpRight, 
   FolderGit2,
-  Sparkles,
   Sliders,
   Github,
   Linkedin,

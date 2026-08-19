@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Sparkles, Layout, Type, CircleDot } from 'lucide-react';
+import { Palette, Sparkles, Layout } from 'lucide-react';
 import { THEME_PRESETS } from '../../data/defaultProfile';
 
 export default function ThemeTab({ theme = {}, onChange }) {

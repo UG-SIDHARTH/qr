@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
-import { X, Download, Copy, Check, QrCode, UserPlus } from 'lucide-react';
-import { downloadVCard, generateVCard } from '../../utils/vcard';
-import { getProfileUrl, getShortProfileUrl } from '../../utils/url';
+import { X, Download, Copy, Check, QrCode } from 'lucide-react';
+import { generateVCard } from '../../utils/vcard';
+import { getShortProfileUrl } from '../../utils/url';
 
 export default function QRModal({ isOpen, onClose, profileData }) {
   const canvasRef = useRef(null);

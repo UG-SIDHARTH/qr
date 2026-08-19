@@ -4,10 +4,8 @@ import {
   Search, 
   Filter, 
   Upload, 
-  Download, 
   Plus, 
   Trash2, 
-  QrCode, 
   Eye, 
   Edit3, 
   CheckSquare, 
@@ -15,7 +13,6 @@ import {
   Sparkles,
   Printer,
   FileSpreadsheet,
-  Building2,
   BadgeCheck
 } from 'lucide-react';
 import { exportMembersToCSV, parseCSVToMembers } from '../../utils/csv';

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getProfileHash, encodeProfileData, decodeProfileData, getProfileUrl } from '../url';
+import { getProfileHash, encodeProfileData, decodeProfileData } from '../url';
 
 describe('url utils', () => {
   describe('getProfileHash', () => {

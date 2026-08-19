@@ -2,22 +2,9 @@ import React from 'react';
 import { 
   Plus, 
   Trash2, 
-  GripVertical, 
   Eye, 
   EyeOff, 
-  ExternalLink,
-  Github, 
-  Linkedin, 
-  Twitter, 
-  Instagram, 
-  Youtube, 
-  Globe, 
-  Mail, 
-  MessageSquare, 
-  Music,
-  Share2,
-  Sparkles,
-  ArrowUpRight
+  Share2
 } from 'lucide-react';
 
 const PRESET_PLATFORMS = [

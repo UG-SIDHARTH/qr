@@ -39,7 +39,7 @@ export function parseCSVToMembers(csvText) {
   const lines = csvText.split(/\r\n|\n/).filter(line => line.trim());
   if (lines.length <= 1) return [];
 
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim().toLowerCase());
+
   const members = [];
 
   for (let i = 1; i < lines.length; i++) {

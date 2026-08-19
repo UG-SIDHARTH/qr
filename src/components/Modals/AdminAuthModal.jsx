@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, KeyRound, X, Check, ShieldAlert, UserPlus, LogIn, User, Mail, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Lock, X, Check, ShieldAlert, UserPlus, LogIn, User, Mail, Eye, EyeOff } from 'lucide-react';
 
 const ADMIN_PASSCODE = import.meta.env.VITE_ADMIN_PASSCODE || "123456";
 const SUPER_ADMIN_PASSCODE = import.meta.env.VITE_SUPER_ADMIN_PASSCODE || "31072007";

@@ -2,12 +2,7 @@ import React from 'react';
 import { 
   FolderGit2, 
   Plus, 
-  Trash2, 
-  ExternalLink, 
-  Star, 
-  Image as ImageIcon,
-  Tag,
-  Code2
+  Trash2
 } from 'lucide-react';
 
 export default function PortfolioTab({ portfolio = [], onChange }) {
