@@ -398,18 +398,20 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       
-      {/* Navigation Header */}
-      <Header
-        viewMode={viewMode}
-        setViewMode={handleSetViewMode}
-        onOpenExport={() => setIsExportModalOpen(true)}
-        onQuickQR={() => setIsQRModalOpen(true)}
-        onPublish={handlePublishProfile}
-        profile={profileData.profile}
-        isUnlocked={isUnlocked}
-        onRequestUnlock={() => setIsAuthModalOpen(true)}
-        memberCount={membersList.length}
-      />
+      {/* Navigation Header - hidden on public standalone bio page */}
+      {viewMode !== 'preview' && (
+        <Header
+          viewMode={viewMode}
+          setViewMode={handleSetViewMode}
+          onOpenExport={() => setIsExportModalOpen(true)}
+          onQuickQR={() => setIsQRModalOpen(true)}
+          onPublish={handlePublishProfile}
+          profile={profileData.profile}
+          isUnlocked={isUnlocked}
+          onRequestUnlock={() => setIsAuthModalOpen(true)}
+          memberCount={membersList.length}
+        />
+      )}
 
       {/* Main View Layout */}
       {viewMode === 'bulk' ? (
@@ -429,6 +431,7 @@ export default function App() {
             <BioPage 
               profileData={profileData} 
               onOpenQR={() => setIsQRModalOpen(true)} 
+              onOpenEditor={() => handleSetViewMode('editor')}
               isFullView={true} 
             />
           ) : (

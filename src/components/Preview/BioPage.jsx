@@ -8,6 +8,7 @@ import {
   ArrowUpRight, 
   FolderGit2,
   Sparkles,
+  Sliders,
   Github,
   Linkedin,
   Twitter,
@@ -40,7 +41,7 @@ const ICON_MAP = {
   Cpu
 };
 
-export default function BioPage({ profileData = {}, onOpenQR, isFullView = false }) {
+export default function BioPage({ profileData = {}, onOpenQR, onOpenEditor, isFullView = false }) {
   const { profile = {}, socials = [], portfolio = [], theme = {} } = profileData || {};
 
   const buttonRadius = theme?.buttonRadius || 'rounded-2xl';
@@ -63,6 +64,31 @@ export default function BioPage({ profileData = {}, onOpenQR, isFullView = false
   return (
     <div className={`w-full min-h-full flex flex-col items-center justify-center ${theme.bgStyle || 'bg-[#090d16]'} p-4 sm:p-8 transition-all`}>
       
+      {/* Floating Action Controls for Standalone View */}
+      {isFullView && (
+        <div className="fixed top-4 right-4 z-50 flex items-center space-x-2">
+          {onOpenQR && (
+            <button
+              onClick={onOpenQR}
+              className="p-2.5 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-200 rounded-full shadow-lg backdrop-blur-md transition-all hover:scale-105"
+              title="Show QR Code"
+            >
+              <QrCode className="w-4 h-4 text-purple-400" />
+            </button>
+          )}
+          {onOpenEditor && (
+            <button
+              onClick={onOpenEditor}
+              className="px-3.5 py-2 bg-indigo-600/90 hover:bg-indigo-500 text-white border border-indigo-400/30 rounded-full text-xs font-semibold shadow-lg shadow-indigo-600/30 backdrop-blur-md flex items-center space-x-1.5 transition-all hover:scale-105"
+              title="Open Studio Editor"
+            >
+              <Sliders className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Studio Editor</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Outer Card Container (Matches CEAL / Modern Linktree Card aesthetic) */}
       <div className={`w-full ${isFullView ? 'max-w-md my-6 p-6 sm:p-8' : 'max-w-md p-4'} bg-[#0f1422]/90 border border-slate-800/90 rounded-[32px] shadow-2xl backdrop-blur-2xl space-y-6 text-center`}>
         
